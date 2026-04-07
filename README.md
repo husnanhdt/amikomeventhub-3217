@@ -59,6 +59,5 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 **Nama    : Husnan Hidayat** <br>
-**NIM     : 24.12.3217**
-<br>
+**NIM     : 24.12.3217** <br>
 **Link    : https://amikomeventhub-3217-master-tdukkk.free.laravel.cloud/**
