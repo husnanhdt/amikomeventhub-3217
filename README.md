@@ -60,3 +60,5 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 **Nama    : Husnan Hidayat** <br>
 **NIM     : 24.12.3217**
+<br>
+**Link    : https://amikomeventhub-3217-master-tdukkk.free.laravel.cloud/**
