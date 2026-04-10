@@ -2,20 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Route Home
 Route::get('/', function () {
-    $mahasiswa = [
-        'nama' => 'Husnan Hidayat',
-        'nim' => '24.12.3217',
-        'kelas' => 'Digital Business 04',
-    ];
-
-    return view('welcome', compact('mahasiswa'));
+    return view('welcome');
 });
 
-Route::get('/tentang', function () {
-    return '<h1>Ini adalah halaman Tentang Aplikasi Event Hub</h1>';
+// Route Profil
+Route::get('/profil', function () {
+    return view('profil');
 });
 
-Route::get('/kontak', function () {
-    return view('contact');
+// Route Katalog
+Route::get('/katalog', function () {
+    return view('katalog');
+});
+
+// Route Bantuan
+Route::get('/bantuan', function () {
+    return view('bantuan');
 });
