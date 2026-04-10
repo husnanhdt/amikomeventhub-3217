@@ -21,3 +21,12 @@ Route::get('/katalog', function () {
 Route::get('/bantuan', function () {
     return view('bantuan');
 });
+
+Route::get('/tentang', function () {
+    return '<h1>Ini adalah Halaman Tentang Aplikasi Event Hub</h1>';
+});
+
+// Route Kontak
+Route::get('/contact', function () {
+    return view('contact');
+});

@@ -143,6 +143,7 @@
                     <a href="/profil" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Profil</a>
                     <a href="/katalog" class="px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium transition">Katalog</a>
                     <a href="/bantuan" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
+                    <a href="/contact" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -157,10 +158,11 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden glass border-t border-gray-200/50">
             <div class="px-4 py-3 space-y-2">
-                <a href="/" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">🏠 Home</a>
-                <a href="/profil" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">👤 Profil</a>
-                <a href="/katalog" class="block px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium">📋 Katalog</a>
-                <a href="/bantuan" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">❓ Bantuan</a>
+                <a href="/" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Home</a>
+                <a href="/profil" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Profil</a>
+                <a href="/katalog" class="block px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium">Katalog</a>
+                <a href="/bantuan" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
+                <a href="/contact" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
             </div>
         </div>
     </nav>
@@ -304,7 +306,7 @@
     <footer class="glass border-t border-gray-200/60 py-7">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-gray-500 text-sm">
-                © 2026 <span class="text-dark font-semibold">AmikomEventHub</span> • Universitas Amikom Yogyakarta
+                © 2026 <span class="text-dark font-semibold">AmikomEventHub</span> Universitas Amikom Yogyakarta
             </p>
         </div>
     </footer>
