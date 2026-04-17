@@ -23,10 +23,40 @@ Route::get('/bantuan', function () {
 });
 
 Route::get('/tentang', function () {
-    return '<h1>Ini adalah Halaman Tentang Aplikasi Event Hub</h1>';
+    return view('tentang');
 });
 
 // Route Kontak
 Route::get('/contact', function () {
     return view('contact');
+});
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/event-detail', function () {
+    return view('layouts.event-detail');
+});
+
+Route::get('/checkout', function () {
+    return view('layouts.checkout');
+});
+
+Route::get('/ticket', function () {
+    return view('layouts.ticket');
+});
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+});
+
+// Route Admin Event
+Route::get('/admin/events', function () {
+    return view('admin.events');
+}); 
+
+// Route Transaksi
+Route::get('/admin/transactions', function () {
+    return view('admin.transactions');
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontak - AmikomEventHub</title>
+    <title>Tentang - AmikomEventHub</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,12 +83,12 @@
             background-size: 30px 30px;
         }
         
-        .contact-item {
+        .feature-card {
             transition: all 0.3s ease;
         }
-        .contact-item:hover {
-            transform: translateX(4px);
-            border-color: rgba(79, 70, 229, 0.3);
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(79, 70, 229, 0.15);
         }
     </style>
 </head>
@@ -123,6 +123,7 @@
                     <a href="/katalog" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Katalog</a>
                     <a href="/bantuan" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
                     <a href="/contact" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
+                    <a href="/tentang" class="px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium transition">Tentang</a>
                 </div>
                 
                 <!-- Mobile Menu Button -->
@@ -142,94 +143,95 @@
                 <a href="/katalog" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Katalog</a>
                 <a href="/bantuan" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
                 <a href="/contact" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
+                <a href="/tentang" class="block px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium">Tentang</a>
             </div>
         </div>
     </nav>
 
     <!-- Content -->
-    <div class="min-h-screen flex items-center justify-center px-4 pt-24 pb-12">
-        <div class="max-w-2xl w-full">
+    <div class="min-h-screen px-4 pt-24 pb-12">
+        <div class="max-w-5xl mx-auto">
             
             <!-- Header -->
-            <div class="text-center mb-10">
+            <div class="text-center mb-14">
                 <div class="inline-flex items-center px-5 py-2.5 bg-white rounded-full text-gray-700 text-sm mb-6 shadow-sm border border-gray-200/60">
-                    Hubungi Kami
+                    Tentang Kami
                 </div>
                 <h1 class="text-4xl md:text-5xl font-bold text-dark mb-4">
-                    <span class="text-gradient">Kontak</span> AmikomEventHub
+                    Mengenal <span class="text-gradient">AmikomEventHub</span>
                 </h1>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Punya pertanyaan, saran, atau kendala? Kami siap membantu kamu!
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Platform terpusat untuk menemukan, mengikuti, dan mengelola event-event menarik di lingkungan Universitas Amikom Yogyakarta.
                 </p>
             </div>
             
-            <!-- Contact Card -->
-            <div class="glass rounded-3xl p-8 md:p-10 border border-gray-200/60 shadow-xl shadow-gray-200/40">
-                
-                <!-- Contact Methods -->
-                <div class="space-y-5 mb-8">
-                    
-                    <!-- Email -->
-                    <div class="contact-item flex items-start space-x-4 p-5 bg-gray-50/80 rounded-2xl border border-gray-100 hover:shadow-md">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📧</div>
-                        <div>
-                            <h3 class="font-semibold text-dark mb-1">Email</h3>
-                            <a href="mailto:admin@amikomeventhub.ac.id" class="text-primary hover:underline font-medium">
-                                admin@amikomeventhub.ac.id
-                            </a>
-                            <p class="text-gray-500 text-sm mt-1">Balasan dalam 1 x 24 jam</p>
+            <!-- About Card -->
+            <div class="glass rounded-3xl p-8 md:p-10 border border-gray-200/60 shadow-xl shadow-gray-200/40 mb-10">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <!-- Image/Illustration Side -->
+                    <div class="order-2 md:order-1">
+                        <div class="w-full h-64 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center">
+                            <span class="text-7xl">🎪</span>
                         </div>
                     </div>
                     
-                    <!-- WhatsApp -->
-                    <div class="contact-item flex items-start space-x-4 p-5 bg-gray-50/80 rounded-2xl border border-gray-100 hover:shadow-md">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-400 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">💬</div>
-                        <div>
-                            <h3 class="font-semibold text-dark mb-1">WhatsApp</h3>
-                            <a href="https://wa.me/6285724243087" target="_blank" class="text-primary hover:underline font-medium">
-                                +62 857-2424-3087
-                            </a>
-                            <p class="text-gray-500 text-sm mt-1">Senin - Jumat, 09.00 - 17.00 WIB</p>
+                    <!-- Text Side -->
+                    <div class="order-1 md:order-2">
+                        <h2 class="text-2xl font-bold text-dark mb-4">Visi & Misi</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold text-primary mb-1">Visi</h3>
+                                <p class="text-gray-600 text-sm">Menjadi platform event terdepan yang menghubungkan mahasiswa Amikom dengan berbagai kesempatan pengembangan diri dan kolaborasi.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-primary mb-1">Misi</h3>
+                                <ul class="text-gray-600 text-sm space-y-1 list-disc list-inside">
+                                    <li>Menyediakan informasi event yang akurat dan terupdate</li>
+                                    <li>Memudahkan proses pendaftaran dan partisipasi event</li>
+                                    <li>Membangun komunitas mahasiswa yang aktif dan kolaboratif</li>
+                                    <li>Mendukung pengembangan soft skill dan hard skill mahasiswa</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Lokasi -->
-                    <div class="contact-item flex items-start space-x-4 p-5 bg-gray-50/80 rounded-2xl border border-gray-100 hover:shadow-md">
-                        <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-400 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📍</div>
-                        <div>
-                            <h3 class="font-semibold text-dark mb-1">Lokasi</h3>
-                            <p class="text-gray-600">
-                                Universitas Amikom Yogyakarta<br>
-                                Jl. Ringroad Utara, Condongcatur,<br>
-                                Depok, Sleman, DIY 55283
-                            </p>
-                        </div>
-                    </div>
-                    
                 </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-gray-200/60 my-6"></div>
-                
-                <!-- Quick Actions -->
-                <div class="text-center">
-                    <p class="text-gray-600 mb-4">Atau kembali ke halaman utama untuk menjelajahi event :</p>
-                    <a href="/" class="inline-flex items-center px-7 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 transition-all duration-300 no-underline">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
-                        Kembali ke Home
-                    </a>
-                </div>
-                
             </div>
             
-            <!-- Additional Info -->
-            <div class="text-center mt-8">
-                <p class="text-gray-500 text-sm">
-                    Kami merespons secepat mungkin selama jam kerja<br>
-                    Prioritas untuk mahasiswa Amikom Yogyakarta
-                </p>
+            <!-- Features Section -->
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold text-dark text-center mb-8">Fitur Unggulan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    
+                    <!-- Feature 1 -->
+                    <div class="feature-card glass rounded-2xl p-6 border border-gray-200/60">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center text-2xl mb-4">📋</div>
+                        <h3 class="font-semibold text-dark mb-2">Katalog Event</h3>
+                        <p class="text-gray-600 text-sm">Jelajahi berbagai event menarik dengan filter kategori, tanggal, dan lokasi yang mudah digunakan.</p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="feature-card glass rounded-2xl p-6 border border-gray-200/60">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center text-2xl mb-4">🔔</div>
+                        <h3 class="font-semibold text-dark mb-2">Notifikasi</h3>
+                        <p class="text-gray-600 text-sm">Dapatkan pengingat untuk event yang kamu ikuti agar tidak ketinggalan jadwal penting.</p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="feature-card glass rounded-2xl p-6 border border-gray-200/60">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-400 rounded-xl flex items-center justify-center text-2xl mb-4">👥</div>
+                        <h3 class="font-semibold text-dark mb-2">Komunitas</h3>
+                        <p class="text-gray-600 text-sm">Terhubung dengan mahasiswa lain yang memiliki minat dan passion yang sama.</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="text-center mt-10">
+                <p class="text-gray-600 mb-4">Tertarik untuk menjelajahi event kami?</p>
+                <a href="/katalog" class="inline-flex items-center px-7 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 transition-all duration-300 no-underline">
+                    Lihat Katalog Event
+                </a>
             </div>
             
         </div>
@@ -239,7 +241,7 @@
     <footer class="glass border-t border-gray-200/60 py-7">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-gray-500 text-sm">
-                © 2026 <span class="text-dark font-semibold">AmikomEventHub</span> Universitas Amikom Yogyakarta
+                © 2026 <span class="text-dark font-semibold">AmikomEventHub</span> Tugas Praktikum Laravel Universitas Amikom Yogyakarta
             </p>
         </div>
     </footer>

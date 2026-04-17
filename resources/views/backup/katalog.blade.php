@@ -144,6 +144,7 @@
                     <a href="/katalog" class="px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium transition">Katalog</a>
                     <a href="/bantuan" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
                     <a href="/contact" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
+                    <a href="/tentang" class="px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Tentang</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -160,9 +161,10 @@
             <div class="px-4 py-3 space-y-2">
                 <a href="/" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Home</a>
                 <a href="/profil" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Profil</a>
-                <a href="/katalog" class="block px-4 py-2 text-primary bg-primary/10 rounded-lg font-medium">Katalog</a>
+                <a href="/katalog" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Katalog</a>
                 <a href="/bantuan" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Bantuan</a>
                 <a href="/contact" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Kontak</a>
+                <a href="/tentang" class="block px-4 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg font-medium transition">Tentang</a>
             </div>
         </div>
     </nav>
