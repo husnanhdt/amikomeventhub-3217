@@ -102,7 +102,7 @@
                 <p class="text-xs text-slate-400">Order ID #TRX-99210</p>
 
                 <div class="mt-8 space-y-4">
-                    <button onclick="window.location.href='{{ url('/ticket') }}'">
+                    <button onclick="window.location.href='{{ url('/ticket') }}'"
                         class="w-full py-4 border-2 border-indigo-100 rounded-2xl flex justify-between items-center px-6 hover:border-indigo-600 transition group">
                         <span class="font-bold group-hover:text-indigo-600">GoPay / QRIS</span>
                         <span class="text-indigo-400">→</span>
