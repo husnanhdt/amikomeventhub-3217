@@ -36,15 +36,15 @@ Route::get('/', function () {
 });
 
 Route::get('/event-detail', function () {
-    return view('layouts.event-detail');
+    return view('event-detail');
 });
 
 Route::get('/checkout', function () {
-    return view('layouts.checkout');
+    return view('checkout');
 });
 
 Route::get('/ticket', function () {
-    return view('layouts.ticket');
+    return view('ticket');
 });
 
 Route::get('/admin/dashboard', function () {
