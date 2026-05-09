@@ -12,6 +12,9 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        @media print {
+            .no-print { display: none; }
+        }
     </style>
 </head>
 
@@ -35,7 +38,9 @@
             <!-- Ticket Header -->
             <div class="p-8 bg-indigo-50 border-b-4 border-dashed border-indigo-100 text-center relative">
                 <p class="text-indigo-600 font-bold uppercase tracking-widest text-xs mb-2">E-Ticket Resmi</p>
-                <h2 class="text-2xl font-black leading-tight">Jazz Night 2024: A Celebration</h2>
+                <h2 class="text-2xl font-black leading-tight">
+                    {{ $transaction->event->title ?? 'Jazz Night 2024: A Celebration' }}
+                </h2>
 
                 <!-- Ticket Side Cuts -->
                 <div class="absolute -left-4 -bottom-4 w-8 h-8 bg-indigo-600 rounded-full"></div>
@@ -47,57 +52,63 @@
                 <div class="grid grid-cols-2 gap-6">
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase mb-1">Nama Pembeli</p>
-                        <p class="font-bold text-lg">Donni Prabowo</p>
+                        <p class="font-bold text-lg">
+                            {{ $transaction->customer_name ?? 'Donni Prabowo' }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase mb-1">Tanggal & Waktu</p>
-                        <p class="font-bold text-lg">16 Nov, 19:30</p>
+                        <p class="font-bold text-lg">
+                            @if($transaction->event)
+                                {{ \Carbon\Carbon::parse($transaction->event->date)->format('d M, H:i') }}
+                            @else
+                                16 Nov, 19:30
+                            @endif
+                        </p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase mb-1">Order ID</p>
-                        <p class="font-bold">TRX-99210</p>
+                        <p class="font-bold">
+                            {{ $transaction->order_id ?? 'TRX-99210' }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-slate-400 text-xs font-bold uppercase mb-1">Lokasi</p>
-                        <p class="font-bold">Blue Note Lounge</p>
+                        <p class="font-bold">
+                            {{ $transaction->event->location ?? 'Blue Note Lounge' }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="bg-slate-100 p-6 rounded-3xl flex flex-col items-center">
                     <p class="text-slate-400 text-xs font-bold uppercase mb-4">Scan QR untuk Check-in</p>
-                    <!-- Mock QR Code -->
+                    
+                    {{-- QR Code Asli --}}
                     <div class="w-48 h-48 bg-white p-4 rounded-xl shadow-inner flex items-center justify-center">
-                        <div class="w-full h-full border-4 border-slate-900 flex flex-wrap p-1">
-                            <!-- Just some boxes for mock QR -->
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                            <div class="w-1/4 h-1/4 bg-white"></div>
-                            <div class="w-1/4 h-1/4 bg-slate-900"></div>
-                        </div>
+                        {!! QrCode::size(150)->generate(json_encode([
+                            'order_id' => $transaction->order_id,
+                            'event' => $transaction->event->title ?? 'Event',
+                            'customer' => $transaction->customer_name,
+                            'date' => $transaction->event->date ?? now(),
+                            'location' => $transaction->event->location ?? 'Location'
+                        ])) !!}
                     </div>
-                    <p class="mt-4 font-mono font-bold text-slate-800">TKT-001293848</p>
+                    
+                    <p class="mt-4 font-mono font-bold text-slate-800">
+                        TKT-{{ substr($transaction->order_id ?? '001293848', 4) }}
+                    </p>
                 </div>
             </div>
 
             <div class="px-8 pb-8">
                 <button onclick="window.print()"
-                    class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition">
+                    class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition no-print">
                     Cetak / Simpan PDF
                 </button>
                 <a href="{{ url('/') }}"
-                    class="block text-center mt-4 text-slate-500 font-bold hover:text-indigo-600">Kembali ke Beranda</a>
+                    class="block text-center mt-4 text-slate-500 font-bold hover:text-indigo-600 no-print">
+                    Kembali ke Beranda
+                </a>
             </div>
         </div>
     </div>
