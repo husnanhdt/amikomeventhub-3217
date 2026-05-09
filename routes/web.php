@@ -34,7 +34,7 @@ Route::get('/checkout/{id}', [EventController::class, 'checkout'])->name('checko
 Route::post('/checkout/{id}/process', [EventController::class, 'process'])->name('checkout.process');
 
 // Ticket: tidak butuh ID (menampilkan hasil pembayaran)
-Route::get('/ticket', [EventController::class, 'ticket'])->name('ticket');
+Route::get('/ticket/{id?}', [EventController::class, 'ticket'])->name('ticket');
 
 /*
 |--------------------------------------------------------------------------

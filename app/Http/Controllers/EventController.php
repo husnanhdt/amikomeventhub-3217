@@ -8,67 +8,72 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    // SHOW: Detail event untuk user (public)
     public function show($id)
     {
         $event = Event::with('category')->findOrFail($id);
         return view('event-detail', compact('event'));
     }
 
-    // CHECKOUT: Tampilkan halaman checkout
     public function checkout($id)
     {
         $event = Event::findOrFail($id);
         return view('checkout', compact('event'));
     }
 
-    // ✅ PROCESS: Simpan transaksi ke database
     public function process(Request $request, $id)
-{
-    $event = Event::findOrFail($id);
+    {
+        $event = Event::findOrFail($id);
 
-    // Validasi
-    $validated = $request->validate([
-        'customer_name' => 'required|string|max:255',
-        'customer_email' => 'required|email|max:255',
-        'customer_phone' => 'required|string|max:20',
-    ]);
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
+        ]);
 
-    // Simpan transaksi
-    $transaction = Transaction::create([
-        'event_id' => $event->id,
-        'order_id' => 'TRX-' . date('YmdHis'),
-        'customer_name' => $validated['customer_name'],
-        'customer_email' => $validated['customer_email'],
-        'customer_phone' => $validated['customer_phone'],
-        'total_price' => $event->price + 5000,
-        'status' => 'Success', // Langsung success untuk simulasi
-        'snap_token' => null,
-    ]);
+        $transaction = Transaction::create([
+            'event_id' => $event->id,
+            'order_id' => 'TRX-' . date('YmdHis') . '-' . strtoupper(substr(uniqid(), -4)),
+            'customer_name' => $validated['customer_name'],
+            'customer_email' => $validated['customer_email'],
+            'customer_phone' => $validated['customer_phone'],
+            'total_price' => $event->price + 5000,
+            'status' => 'Success',
+            'snap_token' => null,
+        ]);
 
-    // Redirect ke halaman ticket
-    return redirect()->route('ticket')->with('transaction', $transaction);
-}
-
-    // TICKET: Tampilkan halaman ticket
-    public function ticket()
-{
-    $transaction = session('transaction');
-    
-    if (!$transaction) {
-        return redirect('/')->with('error', 'Tidak ada data transaksi');
+        // ✅ FIX: Kirim ID sebagai fallback + session
+        return redirect()->route('ticket', ['id' => $transaction->id])
+            ->with('transaction', $transaction);
     }
 
-    $transaction->load('event');
+    public function ticket($id = null)  // ✅ FIX: Terima parameter opsional
+    {
+        $transaction = null;
 
-    // Data yang akan disimpan di QR Code
-    $qrData = [
-        'order_id' => $transaction->order_id,
-        'event' => $transaction->event->title,
-        'customer' => $transaction->customer_name,
-        'date' => $transaction->event->date,
-    ];
+        // 1. Coba dari database dulu
+        if ($id) {
+            $transaction = Transaction::with('event')->find($id);
+        }
 
-    return view('ticket', compact('transaction', 'qrData'));
-}
+        // 2. Fallback ke session
+        if (!$transaction) {
+            $transaction = session('transaction');
+            if ($transaction && is_object($transaction)) {
+                $transaction->load('event');
+            }
+        }
+
+        if (!$transaction) {
+            return redirect('/')->with('error', 'Data transaksi tidak ditemukan');
+        }
+
+        $qrData = [
+            'order_id' => $transaction->order_id,
+            'event' => $transaction->event->title ?? 'Event',
+            'customer' => $transaction->customer_name,
+            'date' => $transaction->event->date ?? now(),
+        ];
+
+        return view('ticket', compact('transaction', 'qrData'));
+    }
 }
