@@ -4,8 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\Auth\LoginController; // ← Import untuk Auth
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\PartnerController;
+
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATION ROUTES (PUBLIC - Untuk Admin Login)
+|--------------------------------------------------------------------------
+*/
+// Route login admin (bisa diakses siapa saja)
+Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [LoginController::class, 'login']);
+Route::post('/admin/logout', [LoginController::class, 'logout'])->name('admin.logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +40,7 @@ Route::get('/contact', fn() => view('contact'))->name('contact');
 // Detail event: butuh {id}
 Route::get('/event-detail/{id}', [EventController::class, 'show'])->name('events.show');
 
-// ✅ Checkout: BUTUH {id} ← FIX ERROR ArgumentCountError
+// ✅ Checkout: BUTUH {id}
 Route::get('/checkout/{id}', [EventController::class, 'checkout'])->name('checkout');
 
 // Tambahkan di bawah route checkout
@@ -38,25 +51,32 @@ Route::get('/ticket/{id?}', [EventController::class, 'ticket'])->name('ticket');
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN AREA - Dashboard & Management
+| ADMIN AREA - Dashboard & Management (PROTECTED)
 |--------------------------------------------------------------------------
 */
 
 // Group route admin dengan prefix dan naming convention
-Route::prefix('admin')->name('admin.')->group(function () {
-    
+// ✅ Tambahkan ->middleware('auth') agar semua route admin wajib login dulu
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+
     // Dashboard Admin
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // ✅ Kelola Event (Admin) - CRUD Resource
+
+    // Kelola Event (Admin) - CRUD Resource
     Route::resource('events', AdminEventController::class);
 
     // Laporan Transaksi (Admin)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-    
+
+    // Category Routes
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
+    // Partner Routes
+    Route::resource('partners', \App\Http\Controllers\Admin\PartnerController::class);
+
 });
 
-// Logout route
+// Logout route (standalone - untuk user biasa jika ada)
 Route::post('/logout', function () {
     // Untuk sementara, redirect ke home saja
     // Nanti kalau sudah ada autentikasi, gunakan: Auth::logout();

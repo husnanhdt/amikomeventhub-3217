@@ -81,14 +81,26 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($events as $event)
         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
+            
+            <!-- ✅ BAGIAN GAMBAR YANG DIPERBAIKI -->
             <div class="relative overflow-hidden aspect-[3/4]">
-                <img src="{{ $event->poster_path ? asset($event->poster_path) : 'https://placehold.co/400x600?text=No+Image' }}"
-                    alt="{{ $event->title }}"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                @if($event->poster_path)
+                    <img src="{{ asset('storage/' . $event->poster_path) }}" 
+                         alt="{{ $event->title }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}';">
+                @else
+                    <img src="https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}" 
+                         alt="{{ $event->title }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                @endif
+                
                 <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                     {{ $event->category->name ?? 'Umum' }}
                 </div>
             </div>
+            <!-- ✅ END BAGIAN GAMBAR -->
+
             <div class="p-6">
                 <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-600 transition">{{ $event->title }}</h3>
                 <div class="flex items-center gap-2 text-slate-500 text-sm mb-4">
@@ -114,4 +126,33 @@
     </div>
 
 </section>
+
+<!-- ✅ Partner & Sponsor Section -->
+@if(isset($partners) && $partners->count() > 0)
+<section class="py-16 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-black text-slate-900 mb-2">Partner & Sponsor</h2>
+            <p class="text-slate-500 font-medium">Didukung oleh perusahaan dan institusi terkemuka</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
+            @foreach($partners as $partner)
+            <div class="flex items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition group">
+                @if($partner->logo)
+                <img src="{{ asset('storage/' . $partner->logo) }}"
+                    alt="{{ $partner->name }}"
+                    class="max-h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition grayscale group-hover:grayscale-0">
+                @else
+                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 font-bold text-xs text-center">
+                    {{ strtoupper(substr($partner->name, 0, 2)) }}
+                </div>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 @endsection
