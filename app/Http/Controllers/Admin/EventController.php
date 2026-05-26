@@ -39,17 +39,14 @@ class EventController extends Controller
             'location' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:1',
-            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle upload poster
         if ($request->hasFile('poster')) {
-            $path = $request->file('poster')->store('posters', 'public');
-            $validated['poster_path'] = $path;
+            $validated['poster_path'] = $request->file('poster')->store('posters', 'cloud');
         }
 
         Event::create($validated);
-
         return redirect()->route('admin.events.index')->with('success', '✅ Event berhasil ditambahkan!');
     }
 
@@ -81,21 +78,14 @@ class EventController extends Controller
             'poster' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Jika ada file baru diupload
         if ($request->hasFile('poster')) {
-            // 1. Hapus poster lama dari storage (jika ada)
-            if ($event->poster_path && Storage::disk('public')->exists($event->poster_path)) {
-                Storage::disk('public')->delete($event->poster_path);
+            if ($event->poster_path) {
+                Storage::disk('cloud')->delete($event->poster_path);
             }
-
-            // 2. Upload poster baru
-            $path = $request->file('poster')->store('posters', 'public');
-            $validated['poster_path'] = $path;
+            $validated['poster_path'] = $request->file('poster')->store('posters', 'cloud');
         }
-        // Jika tidak upload file baru, poster lama tetap dipakai (tidak masuk $validated)
 
         $event->update($validated);
-
         return redirect()->route('admin.events.index')->with('success', '✅ Event berhasil diperbarui!');
     }
 
