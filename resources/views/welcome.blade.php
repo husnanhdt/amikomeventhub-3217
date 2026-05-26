@@ -83,7 +83,7 @@
         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
 
             <!-- ✅ GAMBAR EVENT - LANGSUNG PAKAI POSTER_URL -->
-            <div class="relative overflow-hidden aspect-[3/4]">
+            <div class="relative overflow-hidden 'aspect-[3/4]'">
                 <img src="{{ $event->poster_url }}"
                     alt="{{ $event->title }}"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">

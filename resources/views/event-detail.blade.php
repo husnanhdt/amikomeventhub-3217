@@ -5,7 +5,7 @@
     <!-- Left: Poster -->
     <div class="lg:col-span-1">
         <div class="sticky top-32">
-            <img src="{{ $event->poster_path ? asset($event->poster_path) : 'https://placehold.co/400x600?text=No+Image' }}"
+            <img src="{{ $event->poster_url }}"
                 alt="{{ $event->title }}"
                 class="w-full rounded-[2.5rem] shadow-2xl border-8 border-white">
 
