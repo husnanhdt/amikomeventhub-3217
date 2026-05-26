@@ -3,40 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
     protected $fillable = [
-        'category_id',
-        'title',
-        'description',
-        'date',
-        'location',
-        'price',
-        'stock',
-        'poster_path'
+        'category_id', 'title', 'description', 'date', 
+        'location', 'price', 'stock', 'poster_path'
     ];
 
     protected $casts = [
         'date' => 'datetime',
-        'price' => 'integer',
-        'stock' => 'integer',
     ];
 
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    // ✅ GANTI DENGAN INI
     public function getPosterUrlAttribute()
     {
         if (!$this->poster_path) {
-            return null;
+            return 'https://placehold.co/400x600/6366f1/ffffff?text=No+Image';
         }
-        
-        // Untuk cloud storage, langsung return path dengan prefix storage
+
+        // Untuk Laravel Cloud, coba akses langsung
+        if (Storage::disk('public')->exists($this->poster_path)) {
+            return Storage::url($this->poster_path);
+        }
+
+        // Fallback ke asset
         return asset('storage/' . $this->poster_path);
     }
 }

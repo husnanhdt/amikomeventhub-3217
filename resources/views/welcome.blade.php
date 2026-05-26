@@ -77,28 +77,22 @@
         @endforeach
     </div>
 
-    <!-- 🔽 EVENT GRID DINAMIS (BARU) 🔽 -->
+    <!-- 🔽 EVENT GRID DINAMIS (SIMPEL & CLEAN) 🔽 -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($events as $event)
         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
 
-            <!-- ✅ BAGIAN GAMBAR YANG DIPERBAIKI -->
-            <div class="relative overflow-hidden 'aspect-[3/4]'">
-                @if($event->poster_path)
-                <img src="{{ $event->poster_url ?? 'https://placehold.co/400x600/6366f1/ffffff?text=' . urlencode($event->title) }}"
+            <!-- ✅ GAMBAR EVENT - LANGSUNG PAKAI POSTER_URL -->
+            <div class="relative overflow-hidden aspect-[3/4]">
+                <img src="{{ $event->poster_url }}"
                     alt="{{ $event->title }}"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                @else
-                <img src="https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}"
-                    alt="{{ $event->title }}"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                @endif
 
                 <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                     {{ $event->category->name ?? 'Umum' }}
                 </div>
             </div>
-            <!-- ✅ END BAGIAN GAMBAR -->
+            <!-- ✅ END GAMBAR -->
 
             <div class="p-6">
                 <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-600 transition">{{ $event->title }}</h3>
