@@ -85,13 +85,14 @@
     </div>
 </main>
 
-<!-- Overlay Midtrans Simulation -->
+<!-- ✅ OVERLAY MIDTRANS (Hapus 'flex' dari class awal) -->
 <div id="midtrans-overlay"
-    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-6">
     <div class="bg-white w-full max-w-sm 'rounded-[2rem]' overflow-hidden shadow-2xl animate-bounce-in">
         <div class="bg-slate-50 p-6 flex justify-between items-center border-b">
-            <img src="https://midtrans.com/assets/img/logo-dark.png" alt="Midtrans Logo" class="h-6">
-            <button onclick="hideMidtrans()" class="p-2 hover:bg-slate-200 rounded-full">
+            <!-- Logo Midtrans (Opsional, bisa pakai teks saja jika URL mati) -->
+            <span class="font-black text-indigo-700 text-lg">MIDTRANS</span>
+            <button onclick="hideMidtrans()" class="p-2 hover:bg-slate-200 rounded-full transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18"></path>
                 </svg>
@@ -103,7 +104,6 @@
             <p class="text-xs text-slate-400">Order ID #TRX-{{ date('YmdHis') }}</p>
 
             <div class="mt-8 space-y-4">
-                {{-- ✅ SUBMIT FORM untuk simpan transaksi --}}
                 <button type="button" onclick="processPayment()"
                     class="w-full py-4 border-2 border-indigo-100 rounded-2xl flex justify-between items-center px-6 hover:border-indigo-600 transition group">
                     <span class="font-bold group-hover:text-indigo-600">Simulasi Pembayaran →</span>
@@ -121,50 +121,32 @@
     </div>
 </div>
 
+<!-- ✅ JAVASCRIPT LOGIC (Validasi dulu baru tampil modal) -->
 <script>
     function showMidtrans() {
-        // Validasi form dulu
         const form = document.getElementById('checkout-form');
-        if (form.checkValidity()) {
-            // Tampilkan overlay Midtrans
-            document.getElementById('midtrans-overlay').classList.remove('hidden');
-            document.getElementById('midtrans-overlay').classList.add('flex');
-        } else {
-            form.reportValidity();
+
+        // 1. Cek validasi HTML5 (required, email format, dll)
+        if (!form.checkValidity()) {
+            form.reportValidity(); // Munculkan pesan error bawaan browser
+            return; // STOP! Jangan lanjut ke modal
         }
+
+        // 2. Jika VALID, baru tampilkan modal
+        const overlay = document.getElementById('midtrans-overlay');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex'); // Tambah flex HANYA saat tampil
     }
 
     function hideMidtrans() {
-        document.getElementById('midtrans-overlay').classList.add('hidden');
-        document.getElementById('midtrans-overlay').classList.remove('flex');
+        const overlay = document.getElementById('midtrans-overlay');
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
     }
 
-    // ✅ Fungsi untuk process pembayaran
     function processPayment() {
-        // Submit form ke backend untuk simpan transaksi
+        // Submit form ke backend setelah user klik "Simulasi Pembayaran"
         document.getElementById('checkout-form').submit();
     }
 </script>
-
-<style>
-    @keyframes bounce-in {
-        0% {
-            transform: scale(0.9);
-            opacity: 0;
-        }
-
-        70% {
-            transform: scale(1.05);
-            opacity: 1;
-        }
-
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    .animate-bounce-in {
-        animation: bounce-in 0.4s ease-out forwards;
-    }
-</style>
 @endsection
