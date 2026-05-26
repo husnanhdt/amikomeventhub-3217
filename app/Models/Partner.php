@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Partner extends Model
 {
@@ -10,4 +11,14 @@ class Partner extends Model
         'name',
         'logo', // Bukan logo_url lagi
     ];
+
+     public function getLogoUrlAttribute()
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        
+        // Untuk cloud storage, langsung return path dengan prefix storage
+        return asset('storage/' . $this->logo);
+    }
 }

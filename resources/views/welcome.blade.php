@@ -81,20 +81,19 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($events as $event)
         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
-            
+
             <!-- ✅ BAGIAN GAMBAR YANG DIPERBAIKI -->
             <div class="relative overflow-hidden 'aspect-[3/4]'">
                 @if($event->poster_path)
-                    <img src="{{ asset('storage/' . $event->poster_path) }}" 
-                         alt="{{ $event->title }}"
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                         onerror="this.onerror=null; this.src='https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}';">
+                <img src="{{ $event->poster_url ?? 'https://placehold.co/400x600/6366f1/ffffff?text=' . urlencode($event->title) }}"
+                    alt="{{ $event->title }}"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                 @else
-                    <img src="https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}" 
-                         alt="{{ $event->title }}"
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <img src="https://placehold.co/400x600/6366f1/ffffff?text={{ urlencode($event->title) }}"
+                    alt="{{ $event->title }}"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                 @endif
-                
+
                 <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                     {{ $event->category->name ?? 'Umum' }}
                 </div>
@@ -139,15 +138,9 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
             @foreach($partners as $partner)
             <div class="flex items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition group">
-                @if($partner->logo)
-                <img src="{{ asset('storage/' . $partner->logo) }}"
+                <img src="{{ $partner->logo_url ?? 'https://placehold.co/100x100/e2e8f0/64748b?text=' . urlencode(substr($partner->name, 0, 2)) }}"
                     alt="{{ $partner->name }}"
                     class="max-h-16 w-auto object-contain opacity-70 group-hover:opacity-100 transition grayscale group-hover:grayscale-0">
-                @else
-                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 font-bold text-xs text-center">
-                    {{ strtoupper(substr($partner->name, 0, 2)) }}
-                </div>
-                @endif
             </div>
             @endforeach
         </div>

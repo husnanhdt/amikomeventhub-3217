@@ -47,8 +47,9 @@
                     </td>
                     <td class="px-8 py-6">
                         @if($partner->logo)
-                        <img src="{{ asset('storage/' . $partner->logo) }}" alt="{{ $partner->name }}"
-                            class="w-16 h-16 rounded-xl object-cover border-2 border-slate-100">
+                        <img src="{{ $partner->logo_url ?? 'https://placehold.co/100x100/e2e8f0/64748b?text=NO+IMG' }}"
+                            alt="{{ $partner->name }}"
+                            class="w-16 h-16 rounded-xl object-cover border border-slate-100">
                         @else
                         <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs">
                             NO IMG

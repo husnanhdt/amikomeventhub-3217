@@ -48,7 +48,9 @@
                     </td>
                     <td class="px-8 py-6">
                         @if($event->poster_path)
-                        <img src="{{ asset('storage/' . $event->poster_path) }}" alt="{{ $event->title }}" class="w-16 h-20 rounded-xl object-cover shadow-sm">
+                        <img src="{{ $event->poster_url ?? 'https://placehold.co/100x120/e2e8f0/64748b?text=NO+IMG' }}"
+                            alt="{{ $event->title }}"
+                            class="w-16 h-20 rounded-xl object-cover shadow-sm">
                         @else
                         <div class="w-16 h-20 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold">NO IMG</div>
                         @endif

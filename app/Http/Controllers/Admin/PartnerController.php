@@ -13,12 +13,11 @@ class PartnerController extends Controller
     {
         $query = Partner::query();
         
-        if ($request->has('search') && $request->search != '') {
-            $query->where('name', 'LIKE', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $query->where('name', 'ILIKE', '%' . $request->search . '%');
         }
         
         $partners = $query->latest()->paginate(10);
-        
         return view('admin.partners.index', compact('partners'));
     }
 
@@ -31,21 +30,15 @@ class PartnerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048', // Max 2MB
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
-        // Handle upload logo
         if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('partners', $filename, 'public');
-            $validated['logo'] = $path;
+            $validated['logo'] = $request->file('logo')->store('partners', 'cloud');
         }
 
         Partner::create($validated);
-
-        return redirect()->route('admin.partners.index')
-            ->with('success', 'Partner berhasil ditambahkan!');
+        return redirect()->route('admin.partners.index')->with('success', 'Partner berhasil ditambahkan!');
     }
 
     public function edit(Partner $partner)
@@ -57,38 +50,26 @@ class PartnerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048', // Max 2MB
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
-        // Handle upload logo baru
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada
-            if ($partner->logo && file_exists(storage_path('app/public/' . $partner->logo))) {
-                Storage::disk('public')->delete($partner->logo);
+            if ($partner->logo) {
+                Storage::disk('cloud')->delete($partner->logo);
             }
-            
-            $file = $request->file('logo');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('partners', $filename, 'public');
-            $validated['logo'] = $path;
+            $validated['logo'] = $request->file('logo')->store('partners', 'cloud');
         }
 
         $partner->update($validated);
-
-        return redirect()->route('admin.partners.index')
-            ->with('success', 'Partner berhasil diperbarui!');
+        return redirect()->route('admin.partners.index')->with('success', 'Partner berhasil diperbarui!');
     }
 
     public function destroy(Partner $partner)
     {
-        // Hapus file logo jika ada
-        if ($partner->logo && file_exists(storage_path('app/public/' . $partner->logo))) {
-            Storage::disk('public')->delete($partner->logo);
+        if ($partner->logo) {
+            Storage::disk('cloud')->delete($partner->logo);
         }
-        
         $partner->delete();
-
-        return redirect()->route('admin.partners.index')
-            ->with('success', 'Partner berhasil dihapus!');
+        return redirect()->route('admin.partners.index')->with('success', 'Partner berhasil dihapus!');
     }
 }
