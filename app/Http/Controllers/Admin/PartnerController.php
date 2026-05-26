@@ -12,11 +12,11 @@ class PartnerController extends Controller
     public function index(Request $request)
     {
         $query = Partner::query();
-        
+
         if ($request->filled('search')) {
             $query->where('name', 'ILIKE', '%' . $request->search . '%');
         }
-        
+
         $partners = $query->latest()->paginate(10);
         return view('admin.partners.index', compact('partners'));
     }
@@ -34,7 +34,7 @@ class PartnerController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $validated['logo'] = $request->file('logo')->store('partners', 'cloud');
+            $validated['logo'] = $request->file('logo')->store('partners', 'public');
         }
 
         Partner::create($validated);
@@ -55,9 +55,9 @@ class PartnerController extends Controller
 
         if ($request->hasFile('logo')) {
             if ($partner->logo) {
-                Storage::disk('cloud')->delete($partner->logo);
+                Storage::disk('public')->delete($partner->logo);
             }
-            $validated['logo'] = $request->file('logo')->store('partners', 'cloud');
+            $validated['logo'] = $request->file('logo')->store('partners', 'public');
         }
 
         $partner->update($validated);

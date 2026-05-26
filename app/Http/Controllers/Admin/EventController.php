@@ -43,7 +43,7 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('poster')) {
-            $validated['poster_path'] = $request->file('poster')->store('posters', 'cloud');
+            $validated['poster_path'] = $request->file('poster')->store('posters', 'public');
         }
 
         Event::create($validated);
@@ -80,11 +80,10 @@ class EventController extends Controller
 
         if ($request->hasFile('poster')) {
             if ($event->poster_path) {
-                Storage::disk('cloud')->delete($event->poster_path);
+                Storage::disk('public')->delete($event->poster_path);
             }
-            $validated['poster_path'] = $request->file('poster')->store('posters', 'cloud');
+            $validated['poster_path'] = $request->file('poster')->store('posters', 'public');
         }
-
         $event->update($validated);
         return redirect()->route('admin.events.index')->with('success', '✅ Event berhasil diperbarui!');
     }
