@@ -17,7 +17,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
             <h3 class="text-xl font-bold mb-6 border-b pb-4">Pesanan Anda</h3>
             <div class="flex gap-6 items-start">
-                <img src="{{ $event->poster_path ? asset($event->poster_path) : 'https://placehold.co/400x600?text=No+Image' }}"
+                <img src="{{ $event->poster_url }}"
                     alt="{{ $event->title }}"
                     class="w-24 h-24 rounded-2xl object-cover">
                 <div>
@@ -87,8 +87,8 @@
 
 <!-- Overlay Midtrans Simulation -->
 <div id="midtrans-overlay"
-    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl animate-bounce-in">
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-sm 'rounded-[2rem]' overflow-hidden shadow-2xl animate-bounce-in">
         <div class="bg-slate-50 p-6 flex justify-between items-center border-b">
             <img src="https://midtrans.com/assets/img/logo-dark.png" alt="Midtrans Logo" class="h-6">
             <button onclick="hideMidtrans()" class="p-2 hover:bg-slate-200 rounded-full">
