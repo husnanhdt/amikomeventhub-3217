@@ -12,7 +12,7 @@ class TransactionController extends Controller
     {
         $query = Transaction::with('event')->latest();
 
-        // Search filter
+        // Search filter (Order ID, Nama, Email)
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -22,8 +22,13 @@ class TransactionController extends Controller
             });
         }
 
-        $transactions = $query->paginate(10);
+        // Filter by status (opsional)
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
 
-        return view('admin.transactions', compact('transactions'));
+        $transactions = $query->paginate(20); // Sesuai modul: 20 per halaman
+
+        return view('admin.transactions.index', compact('transactions'));
     }
 }

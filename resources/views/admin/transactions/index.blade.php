@@ -20,21 +20,33 @@
 <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
     <!-- Search & Filter -->
     <div class="px-8 py-6 bg-slate-50/50 border-b flex flex-wrap gap-4 items-center">
+        
+        <!-- 🔍 Search Form -->
         <div class="flex-1 min-w-[300px] flex gap-2">
             <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex-1 flex gap-2">
                 <input type="text" name="search" placeholder="Cari Order ID, Nama, atau Email..."
                     value="{{ request('search') }}"
-                    class="flex-1 px-5 py-3 rounded-xl border-slate-200 border bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition uppercase text-sm font-medium tracking-wide">
+                    class="flex-1 px-5 py-3 rounded-xl border-slate-200 border bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm font-medium">
                 <button type="submit" class="px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">Cari</button>
             </form>
         </div>
+
+        <!-- 🎛️ Filter Controls -->
         <div class="flex gap-2">
-            <select class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold">
-                <option>Semua Status</option>
-                <option class="text-green-600">Success</option>
-                <option class="text-orange-600">Pending</option>
-                <option class="text-rose-600">Expired</option>
-            </select>
+            
+            <!-- ✅ Status Filter (Form yang berfungsi) -->
+            <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex gap-2">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                
+                <select name="status" onchange="this.form.submit()" class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold cursor-pointer">
+                    <option value="">Semua Status</option>
+                    <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }} class="text-orange-600">Pending</option>
+                    <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }} class="text-green-600">Success</option>
+                    <option value="Expired" {{ request('status') == 'Expired' ? 'selected' : '' }} class="text-rose-600">Expired</option>
+                </select>
+            </form>
+
+            <!-- 📅 Date Filter (Opsional - Static untuk sekarang) -->
             <select class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold">
                 <option>Bulan Ini</option>
                 <option>Bulan Lalu</option>
