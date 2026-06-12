@@ -15,7 +15,12 @@ use App\Http\Controllers\Admin\PartnerController;
 | AUTHENTICATION ROUTES (PUBLIC - Untuk Admin Login)
 |--------------------------------------------------------------------------
 */
-// Route login admin (bisa diakses siapa saja)
+// ✅ Tambahkan route 'login' yang redirect ke admin login
+Route::get('/login', function() {
+    return redirect()->route('admin.login');
+})->name('login');
+
+// Route login admin yang sudah ada
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [LoginController::class, 'login']);
 Route::post('/admin/logout', [LoginController::class, 'logout'])->name('admin.logout');
