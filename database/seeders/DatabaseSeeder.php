@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
             'stock' => 100,
             'poster_path' => 'assets/concert.png',
         ]);
+        
 
         Event::create([
             'category_id' => $category1->id,
