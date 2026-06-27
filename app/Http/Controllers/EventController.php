@@ -66,6 +66,43 @@ public function checkout($id)
         // ✅ 5. Redirect ke halaman tiket (sementara, nanti diarahkan ke Midtrans)
         return redirect()->route('ticket', ['id' => $transaction->id])
             ->with('success', 'Pesanan berhasil dibuat. Silakan lanjutkan pembayaran.');
+
+        // --- INTEGRASI SNAP MIDTRANS ---
+        
+        // Konfigurasi Kredensial Environment Midtrans
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = false; // Mode Sandbox!
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        // Susun Paket Array Data Transaksi
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $totalPrice,
+            ],
+            'customer_details' => [
+                'first_name' => $request->customer_name,
+                'email' => $request->customer_email,
+                'phone' => $request->customer_phone,
+            ],
+        ];
+
+                try {
+            // Perintah Tembak Generate Snap Token
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            
+            // Update rekaman kita bahwa transaksi terkait sudah memiliki id token pelunasan
+            $transaction->update(['snap_token' => $snapToken]);
+            
+            // Redirect ke halaman antarmuka pembayaran final pelanggan
+            return redirect()->route('checkout.payment', $transaction->order_id);
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memproses pembayaran jaringan: ' . $e->getMessage());
+        }
+
+
     }
 
     public function ticket($id = null)  // ✅ FIX: Terima parameter opsional
