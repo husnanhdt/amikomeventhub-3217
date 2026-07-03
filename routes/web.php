@@ -54,6 +54,9 @@ Route::post('/checkout/{id}/process', [EventController::class, 'process'])->name
 // Ticket: tidak butuh ID (menampilkan hasil pembayaran)
 Route::get('/ticket/{id?}', [EventController::class, 'ticket'])->name('ticket');
 
+Route::get('/payment/{order_id}', [\App\Http\Controllers\EventController::class, 'payment'])->name('checkout.payment');
+
+Route::get('/success/{order_id}', [\App\Http\Controllers\EventController::class, 'success'])->name('checkout.success');
 /*
 |--------------------------------------------------------------------------
 | ADMIN AREA - Dashboard & Management (PROTECTED)
@@ -87,3 +90,5 @@ Route::post('/logout', function () {
     // Nanti kalau sudah ada autentikasi, gunakan: Auth::logout();
     return redirect('/')->with('success', 'Anda telah logout');
 })->name('logout');
+
+Route::post('/midtrans/callback', [\App\Http\Controllers\MidtransWebhookController::class, 'handle']);
