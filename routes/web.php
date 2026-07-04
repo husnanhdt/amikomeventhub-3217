@@ -90,3 +90,5 @@ Route::post('/logout', function () {
     // Nanti kalau sudah ada autentikasi, gunakan: Auth::logout();
     return redirect('/')->with('success', 'Anda telah logout');
 })->name('logout');
+
+Route::post('/midtrans/callback', [\App\Http\Controllers\MidtransWebhookController::class, 'handle']);
