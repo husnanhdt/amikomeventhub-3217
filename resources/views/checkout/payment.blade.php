@@ -26,27 +26,68 @@
 
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
 <script type="text/javascript">
-    document.getElementById('pay-button').onclick = function() {
-        // SnapToken acquired from previous step
-        snap.pay('{{ $transaction->snap_token }}', {
-            // Optional
-            onSuccess: function(result) {
-                window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
-            },
-            // Optional
-            onPending: function(result) {
-                window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
-            },
-            // Optional
-            onError: function(result) {
-                alert("Pembayaran Gagal!");
+    const snapToken = '{{ $transaction->snap_token }}';
+    const payButton = document.getElementById('pay-button');
+    
+    // Simpan HTML asli button
+    const originalButtonHtml = payButton.innerHTML;
+    
+    if (!snapToken || snapToken === 'null' || snapToken === '') {
+        payButton.disabled = true;
+        payButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        payButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+        payButton.innerHTML = 'Token Pembayaran Tidak Tersedia';
+    } else {
+        payButton.onclick = function() {
+            setLoadingState(true);
+            
+            snap.pay(snapToken, {
+                onSuccess: function(result) {
+                    // Redirect otomatis
+                    window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
+                },
+                onPending: function(result) {
+                    window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
+                },
+                onError: function(result) {
+                    setLoadingState(false);
+                    alert("Pembayaran Gagal! Silakan coba lagi atau hubungi admin.");
+                },
+                onClose: function() {
+                    setLoadingState(false);
+                }
+            });
+        };
+        
+        // Auto-click setelah 2 detik
+        setTimeout(function() {
+            if (!payButton.disabled) {
+                payButton.click();
             }
-        });
-    };
-
-    // Auto trigger
-    window.onload = function() {
-        document.getElementById('pay-button').click();
+        }, 2000);
+    }
+    
+    // Fungsi untuk set loading state
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            payButton.disabled = true;
+            payButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'animate-bounce-in');
+            payButton.classList.add('bg-indigo-400', 'cursor-wait');
+            payButton.innerHTML = `
+                <span class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Memproses Pembayaran...</span>
+                </span>
+            `;
+        } else {
+            payButton.disabled = false;
+            payButton.classList.remove('bg-indigo-400', 'cursor-wait');
+            payButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'animate-bounce-in');
+            payButton.innerHTML = originalButtonHtml;
+        }
     }
 </script>
 <style>

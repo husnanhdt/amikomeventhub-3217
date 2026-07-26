@@ -24,4 +24,9 @@ class Partner extends Model
         // Fallback ke asset
         return asset('storage/' . $this->logo);
     }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

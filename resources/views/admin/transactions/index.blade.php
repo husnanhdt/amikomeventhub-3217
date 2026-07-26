@@ -20,7 +20,7 @@
 <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
     <!-- Search & Filter -->
     <div class="px-8 py-6 bg-slate-50/50 border-b flex flex-wrap gap-4 items-center">
-        
+
         <!-- 🔍 Search Form -->
         <div class="flex-1 min-w-[300px] flex gap-2">
             <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex-1 flex gap-2">
@@ -33,11 +33,11 @@
 
         <!-- 🎛️ Filter Controls -->
         <div class="flex gap-2">
-            
+
             <!-- ✅ Status Filter (Form yang berfungsi) -->
             <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex gap-2">
                 <input type="hidden" name="search" value="{{ request('search') }}">
-                
+
                 <select name="status" onchange="this.form.submit()" class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold cursor-pointer">
                     <option value="">Semua Status</option>
                     <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }} class="text-orange-600">Pending</option>
@@ -92,17 +92,27 @@
                         {{ \Carbon\Carbon::parse($trx->created_at)->format('H:i') }}
                     </td>
                     <td class="px-8 py-6">
-                        @if($trx->status === 'Success')
+                        @php
+                        // Ubah status jadi huruf kecil semua agar pengecekan lebih akurat
+                        $statusLower = strtolower($trx->status);
+                        @endphp
+
+                        {{-- Jika statusnya success, settlement, atau capture, tampilkan HIJAU --}}
+                        @if(in_array($statusLower, ['success', 'settlement', 'capture']))
                         <span class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold uppercase ring-1 ring-green-200">
-                            {{ $trx->status }}
+                            Success
                         </span>
-                        @elseif($trx->status === 'Pending')
+
+                        {{-- Jika statusnya pending, tampilkan ORANYE --}}
+                        @elseif(in_array($statusLower, ['pending']))
                         <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs font-bold uppercase ring-1 ring-orange-200">
-                            {{ $trx->status }}
+                            Pending
                         </span>
+
+                        {{-- Selain itu (expire, cancel, deny, failed), tampilkan MERAH --}}
                         @else
                         <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-lg text-xs font-bold uppercase ring-1 ring-rose-200">
-                            {{ $trx->status }}
+                            {{ ucfirst($statusLower) }}
                         </span>
                         @endif
                     </td>
@@ -131,4 +141,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

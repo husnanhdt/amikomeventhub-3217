@@ -25,6 +25,7 @@ class PartnerController extends Controller
     {
         return view('admin.partners.create');
     }
+    
 
     public function store(Request $request)
     {

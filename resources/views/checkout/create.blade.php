@@ -49,7 +49,7 @@
 
         <!-- Form Card -->
         <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
-            <h3 class="text-xl font-bold mb-6 italic text-indigo-600 underline underline-offset-8">📦 Data Pemesan (Tanpa Login)</h3>
+            <h3 class="text-xl font-bold mb-6 italic text-indigo-600 underline underline-offset-8"> Data Pemesan (Tanpa Login)</h3>
             <form action="{{ route('checkout.process', $event->id) }}" method="POST" class="space-y-6">
                 @csrf
                 <div>

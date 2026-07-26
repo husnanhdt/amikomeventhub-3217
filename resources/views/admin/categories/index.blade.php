@@ -18,7 +18,7 @@
 
     <!-- Search -->
     <div class="px-8 py-6 bg-slate-50/50 border-b flex flex-wrap gap-4 items-center">
-        <div class="flex-1 min-w-[300px] flex gap-2">
+        <div class="flex-1 min-w-75 flex gap-2">
             <form method="GET" action="{{ route('admin.categories.index') }}" class="flex-1 flex gap-2">
                 <input type="text" name="search" placeholder="Cari nama kategori..."
                     value="{{ request('search') }}"

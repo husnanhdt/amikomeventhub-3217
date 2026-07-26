@@ -4,36 +4,72 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class Event extends Model
 {
     protected $fillable = [
-        'category_id', 'title', 'description', 'date', 
-        'location', 'price', 'stock', 'poster_path'
+        'partner_id',       // ← PASTIKAN ADA
+        'category_id',
+        'title',
+        'description',
+        'date',
+        'end_date',
+        'location',
+        'price',
+        'stock',
+        'poster_path'
     ];
 
     protected $casts = [
         'date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
+    // Relasi ke Partner (WAJIB!)
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class);
+    }
+
+    // Relasi ke Category
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // ✅ GANTI DENGAN INI
+    // Relasi ke Reviews
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // Accessors
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function getTotalReviewsAttribute()
+    {
+        return $this->reviews()->count();
+    }
+
+    public function canBeReviewed()
+    {
+        return $this->end_date && $this->end_date->diffInDays(Carbon::now()) >= 1;
+    }
+
     public function getPosterUrlAttribute()
     {
         if (!$this->poster_path) {
             return 'https://placehold.co/400x600/6366f1/ffffff?text=No+Image';
         }
-
-        // Untuk Laravel Cloud, coba akses langsung
-        if (Storage::disk('public')->exists($this->poster_path)) {
-            return Storage::url($this->poster_path);
-        }
-
-        // Fallback ke asset
         return asset('storage/' . $this->poster_path);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }
