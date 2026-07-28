@@ -10,7 +10,14 @@ class TransactionHistoryController extends Controller
 {
     public function index()
     {
-        $transactions = Auth::user()->transactions()->latest()->get();
+        $user = Auth::user();
+        
+        // Pastikan query mengambil transaksi MILIK USER YANG LOGIN
+        $transactions = Transaction::where('user_id', $user->id)
+            ->with(['event', 'user'])
+            ->latest()
+            ->get();
+        
         return view('user.transaction-history', compact('transactions'));
     }
 }

@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Storage;
 
 class Partner extends Model
 {
-    protected $fillable = ['name', 'logo'];
+    protected $fillable = [
+        'name',
+        'logo',
+        'status'
+    ];
 
     // ✅ GANTI DENGAN INI
     public function getLogoUrlAttribute()
@@ -28,5 +32,16 @@ class Partner extends Model
     public function events()
     {
         return $this->hasMany(Event::class);
+    }
+
+    // Relasi: Partner ini memiliki User (Manager) mana
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id'); // Opsional, jika ada kolom manager_id
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 }

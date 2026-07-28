@@ -21,6 +21,7 @@ class User extends Authenticatable
         'avatar',
         'gender',
         'birth_date',
+        'partner_id',
     ];
 
     protected $hidden = [
@@ -68,7 +69,6 @@ class User extends Authenticatable
     {
         return $this->reviews()->where('event_id', $eventId)->exists();
     }
-
     // ✅ METHOD INI YANG HILANG - Cek apakah user adalah organizer/panitia
     public function isOrganizer()
     {
@@ -86,5 +86,11 @@ class User extends Authenticatable
     public function isSuperAdmin()
     {
         return $this->role === 'superadmin';
+    }
+
+    // Relasi: User ini mengelola Partner mana
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class);
     }
 }

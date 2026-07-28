@@ -25,7 +25,7 @@ class PartnerController extends Controller
     {
         return view('admin.partners.create');
     }
-    
+
 
     public function store(Request $request)
     {
@@ -72,5 +72,21 @@ class PartnerController extends Controller
         }
         $partner->delete();
         return redirect()->route('admin.partners.index')->with('success', 'Partner berhasil dihapus!');
+    }
+
+    public function approve($id)
+    {
+        $partner = Partner::findOrFail($id);
+        $partner->update(['status' => 'approved']);
+
+        return back()->with('success', 'Organizer berhasil disetujui!');
+    }
+
+    public function reject($id)
+    {
+        $partner = Partner::findOrFail($id);
+        $partner->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Organizer ditolak.');
     }
 }

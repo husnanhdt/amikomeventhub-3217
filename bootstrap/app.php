@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'locale' => SetLocale::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'organizer' => \App\Http\Middleware\IsOrganizer::class,
+            'superadmin' => \App\Http\Middleware\IsSuperadmin::class,
         ]);
 
         // 2. PERTAHANKAN PENGECUALIAN CSRF MIDTRANS (Punya kamu yang sudah benar)

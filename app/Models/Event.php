@@ -32,6 +32,11 @@ class Event extends Model
         return $this->belongsTo(Partner::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+    
     // Relasi ke Category
     public function category()
     {
@@ -55,11 +60,17 @@ class Event extends Model
         return $this->reviews()->count();
     }
 
-    public function canBeReviewed()
-    {
-        return $this->end_date && $this->end_date->diffInDays(Carbon::now()) >= 1;
-    }
-
+public function canBeReviewed()
+{
+    // Jika end_date tidak ada, gunakan tanggal event + 1 hari
+    $endDate = $this->end_date 
+        ? \Carbon\Carbon::parse($this->end_date) 
+        : \Carbon\Carbon::parse($this->date)->addDay();
+    
+    // Cek apakah sekarang sudah lewat minimal 1 hari dari end_date
+    // gt() = greater than (lebih besar dari)
+    return \Carbon\Carbon::now()->gt($endDate->addDay());
+}
     public function getPosterUrlAttribute()
     {
         if (!$this->poster_path) {

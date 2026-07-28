@@ -1,6 +1,50 @@
 @extends('layouts.app')
 @section('title', 'Pembayaran - ' . $transaction->event->title)
+
 @section('content')
+@php
+$statusLower = strtolower($transaction->status);
+@endphp
+
+{{-- 1. JIKA TRANSAKSI SUDAH EXPIRED / CANCELLED --}}
+@if(in_array($statusLower, ['expired', 'cancelled', 'deny', 'failure']))
+<main class="max-w-3xl mx-auto px-6 py-20 text-center">
+    <div class="bg-white rounded-3xl border border-slate-200 p-12 shadow-sm inline-block w-full max-w-md">
+        <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-black mb-2 text-slate-900">Transaksi Tidak Dapat Diproses</h2>
+        <p class="text-slate-500 mb-8">Maaf, transaksi untuk event <strong>{{ $transaction->event->title }}</strong> telah {{ $transaction->status }} atau batas waktu habis.</p>
+        <a href="{{ route('transaction.history') }}" class="w-full inline-block py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-700 transition">
+            ← Kembali ke Riwayat Transaksi
+        </a>
+    </div>
+</main>
+
+{{-- 2. JIKA TRANSAKSI SUDAH LUNAS / SUCCESS --}}
+@elseif(in_array($statusLower, ['success', 'paid', 'settlement', 'capture']))
+<main class="max-w-3xl mx-auto px-6 py-20 text-center">
+    <div class="bg-white rounded-3xl border border-slate-200 p-12 shadow-sm inline-block w-full max-w-md">
+        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-black mb-2 text-slate-900">Pembayaran Sudah Lunas</h2>
+        <p class="text-slate-500 mb-8">Terima kasih! Tiket Anda untuk <strong>{{ $transaction->event->title }}</strong> sudah berhasil diproses.</p>
+        <a href="{{ route('ticket', $transaction->id) }}" class="w-full inline-block py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-700 transition mb-3">
+            Lihat E-Ticket
+        </a>
+        <a href="{{ route('transaction.history') }}" class="w-full inline-block py-3 text-slate-500 font-semibold hover:text-indigo-600 transition">
+            Kembali ke Riwayat
+        </a>
+    </div>
+</main>
+
+{{-- 3. LOGIKA ASLI ANDA (TETAP DIPERTAHANKAN 100% UNTUK STATUS PENDING) --}}
+@else
 <main class="max-w-3xl mx-auto px-6 py-20 text-center">
     <div class="bg-white rounded-3xl border border-slate-200 p-12 shadow-sm inline-block w-full max-w-md">
         <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -28,10 +72,10 @@
 <script type="text/javascript">
     const snapToken = '{{ $transaction->snap_token }}';
     const payButton = document.getElementById('pay-button');
-    
+
     // Simpan HTML asli button
     const originalButtonHtml = payButton.innerHTML;
-    
+
     if (!snapToken || snapToken === 'null' || snapToken === '') {
         payButton.disabled = true;
         payButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
@@ -40,25 +84,45 @@
     } else {
         payButton.onclick = function() {
             setLoadingState(true);
-            
+
             snap.pay(snapToken, {
                 onSuccess: function(result) {
-                    // Redirect otomatis
+                    // Redirect otomatis ke halaman sukses
                     window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
                 },
                 onPending: function(result) {
-                    window.location.href = "{{ route('checkout.success', $transaction->order_id) }}";
+                    // Untuk pending, arahkan ke history
+                    window.location.href = "{{ route('transaction.history') }}";
                 },
                 onError: function(result) {
+                    // ✅ UNTUK ERROR/GAGAL: Redirect langsung ke checkout event yang sama
                     setLoadingState(false);
-                    alert("Pembayaran Gagal! Silakan coba lagi atau hubungi admin.");
+
+                    // Tampilkan pesan yang lebih ramah
+                    alert('Pembayaran gagal atau kadaluarsa. Silakan lakukan pemesanan ulang untuk event ini.');
+
+                    // Redirect ke halaman checkout event yang sama
+                    window.location.href = "{{ route('checkout', $transaction->event->id) }}";
                 },
                 onClose: function() {
+                    // ✅ UNTUK POPUP DITUTUP: Tanyakan apakah mau checkout ulang
                     setLoadingState(false);
+
+                    const confirmCheckout = confirm(
+                        'Pembayaran belum diselesaikan. Apakah Anda ingin melakukan pemesanan ulang untuk event ini?'
+                    );
+
+                    if (confirmCheckout) {
+                        // User mau checkout ulang
+                        window.location.href = "{{ route('checkout', $transaction->event->id) }}";
+                    } else {
+                        // User tidak mau, kembalikan ke history
+                        window.location.href = "{{ route('transaction.history') }}";
+                    }
                 }
             });
         };
-        
+
         // Auto-click setelah 2 detik
         setTimeout(function() {
             if (!payButton.disabled) {
@@ -66,7 +130,7 @@
             }
         }, 2000);
     }
-    
+
     // Fungsi untuk set loading state
     function setLoadingState(isLoading) {
         if (isLoading) {
@@ -111,4 +175,5 @@
         animation: bounce-in 0.4s ease-out forwards;
     }
 </style>
+@endif
 @endsection

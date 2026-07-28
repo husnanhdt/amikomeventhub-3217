@@ -3,7 +3,9 @@
 @section('page_title', 'Dashboard Ringkasan')
 
 @section('content')
-<!-- Stats Grid -->
+<!-- ============================================ -->
+<!-- 1. STATS GRID (LOGIKA ASLI ANDA - DIPERTAHANKAN) -->
+<!-- ============================================ -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
     <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
         <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-4">
@@ -49,7 +51,34 @@
     </div>
 </div>
 
-<!-- Latest Sales Table -->
+<!-- ============================================ -->
+<!-- 2. BAGIAN GRAFIK (TAMBAHAN BARU) -->
+<!-- ============================================ -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+    <!-- Grafik 1: Pertumbuhan User -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900 mb-4">Pertumbuhan Pengguna (6 Bulan Terakhir)</h3>
+        <canvas id="userGrowthChart"></canvas>
+    </div>
+
+    <!-- Grafik 2: Pendapatan per Event -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900 mb-4">Top 5 Event Berdasarkan Pendapatan</h3>
+        <canvas id="revenueByEventChart"></canvas>
+    </div>
+</div>
+
+<!-- Grafik 3: Status Transaksi (Pie Chart) -->
+<div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm mb-10">
+    <h3 class="text-lg font-black text-slate-900 mb-4 text-center">Distribusi Status Transaksi</h3>
+    <div class="max-w-md mx-auto">
+        <canvas id="transactionStatusChart"></canvas>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 3. LATEST SALES TABLE (LOGIKA ASLI ANDA - DIPERTAHANKAN) -->
+<!-- ============================================ -->
 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
     <div class="p-8 border-b flex justify-between items-center">
         <h3 class="font-black text-xl">Transaksi Terakhir</h3>
@@ -100,4 +129,79 @@
         </table>
     </div>
 </div>
+
+<!-- ============================================ -->
+<!-- 4. SCRIPT CHART.JS (TAMBAHAN BARU) -->
+<!-- ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Grafik 1: Pertumbuhan User (Line Chart)
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: @json($userGrowthLabels),
+            datasets: [{
+                label: 'Jumlah User Baru',
+                data: @json($userGrowthData),
+                borderColor: 'rgb(99, 102, 241)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+
+    // Grafik 2: Pendapatan per Event (Bar Chart)
+    const revenueCtx = document.getElementById('revenueByEventChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: @json($revenueByEventLabels),
+            datasets: [{
+                label: 'Pendapatan (Rp)',
+                data: @json($revenueByEventData),
+                backgroundColor: [
+                    'rgba(99, 102, 241, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Grafik 3: Status Transaksi (Pie Chart)
+    const statusCtx = document.getElementById('transactionStatusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: @json($statusLabels),
+            datasets: [{
+                data: @json($statusData),
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.8)',  // Success - Hijau
+                    'rgba(245, 158, 11, 0.8)',  // Pending - Kuning
+                    'rgba(239, 68, 68, 0.8)',   // Expired/Failed - Merah
+                    'rgba(107, 114, 128, 0.8)'  // Lainnya - Abu-abu
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+</script>
 @endsection

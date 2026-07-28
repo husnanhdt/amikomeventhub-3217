@@ -23,7 +23,7 @@ class OrganizerController extends Controller
         $averageRating = $allReviews->avg('rating') ?? 0;
         $totalReviews = $allReviews->count();
 
-        return view('organizers.show', compact(
+        return view('organizer.show', compact(
             'partner', 
             'events', 
             'allReviews', 

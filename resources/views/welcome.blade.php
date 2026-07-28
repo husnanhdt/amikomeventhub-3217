@@ -1,48 +1,85 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Hero Section (TIDAK DIUBAH) -->
-<section class="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-12">
-    <div class="flex-1 space-y-8">
-        <span class="inline-block px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold uppercase tracking-wider">#1 Event Platform</span>
-        <h1 class="text-5xl md:text-7xl font-extrabold leading-tight">
-            Temukan & Pesan <span class="text-indigo-600">Tiket Event</span> Impianmu.
-        </h1>
-        <p class="text-lg text-slate-500 max-w-lg leading-relaxed">
-            Dari konser musik hingga workshop teknologi, semua ada di genggamanmu. Pesan aman & cepat dengan Midtrans.
-        </p>
-        <div class="flex gap-4">
-            <a href="#events" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:scale-105 transition-transform">
-                Mulai Jelajah
-            </a>
-            <a href="#" class="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-lg hover:border-indigo-600 hover:text-indigo-600 transition">
-                Cara Pesan
-            </a>
-        </div>
+<!-- ============================================ -->
+<!-- 1. HERO SECTION (DIPERBARUI: Desain Modern + Routing Dinamis) -->
+<!-- ============================================ -->
+<section class="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <!-- Background Blobs Animation -->
+    <div class="absolute inset-0 opacity-30 pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
     </div>
-    <div class="flex-1 relative">
-        <div class="absolute -top-10 -left-10 w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <img src="assets/concert.png" alt="Concert" class="rounded-[2rem] shadow-2xl relative z-10 w-full object-cover aspect-[4/5] object-center">
 
-        <div class="absolute -bottom-6 -left-6 glass p-6 rounded-2xl shadow-xl z-20 border border-white">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-12 w-full">
+        <!-- Left Content -->
+        <div class="flex-1 space-y-8 text-center md:text-left">
+            <span class="inline-block px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold uppercase tracking-wider shadow-sm">#1 Event Platform</span>
+
+            <h1 class="text-5xl md:text-7xl font-black leading-tight text-slate-900">
+                Temukan & Pesan <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                    Tiket Event Impianmu.
+                </span>
+            </h1>
+
+            <p class="text-lg text-slate-600 max-w-lg mx-auto md:mx-0 leading-relaxed">
+                Dari konser musik hingga workshop teknologi, semua ada di genggamanmu. Pesan aman, cepat, dan terpercaya dengan integrasi Midtrans.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <!-- ✅ ROUTING DINAMIS: Smooth scroll ke bagian #events di bawah -->
+                <a href="#events" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    Mulai Jelajah
+                </a>
+                <!-- ✅ ROUTING DINAMIS: Arahkan ke halaman Cara Pesan -->
+                <a href="{{ route('how-to-order') }}" class="px-8 py-4 bg-white text-slate-700 border-2 border-slate-200 rounded-2xl font-bold text-lg hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300">
+                    Cara Pesan
+                </a>
+            </div>
+
+            <!-- Trust Badge -->
+            <div class="flex items-center gap-4 pt-4 justify-center md:justify-start glass p-4 rounded-2xl border border-white/50 w-fit mx-auto md:mx-0">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-bold uppercase">Terverifikasi</p>
-                    <p class="font-bold">Pembayaran Aman via Midtrans</p>
+                    <p class="font-bold text-slate-900">Pembayaran Aman via Midtrans</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content - Event Poster -->
+        <div class="flex-1 relative w-full max-w-md mx-auto md:max-w-none">
+            <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/50">
+                <img src="{{ asset('assets/concert.png') }}"
+                    alt="Concert Event"
+                    class="w-full h-auto object-cover aspect-[4/5] object-center relative z-10"
+                    onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&auto=format&fit=crop'">
+
+                <!-- Overlay Info -->
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 z-20">
+                    <p class="text-white font-bold text-xl">Jazz Night 2026</p>
+                    <p class="text-slate-200 text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        21 Sep 2026 • Amikom Baru
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Events Section (DINAMIS - PRAKTIKUM 6) -->
-<section id="events" class="max-w-7xl mx-auto px-6 py-20">
+<!-- ============================================ -->
+<!-- 2. EVENTS SECTION (LOGIKA ASLI ANDA - DIPERTAHANKAN 100%) -->
+<!-- ============================================ -->
+<section id="events" class="max-w-7xl mx-auto px-6 py-20 scroll-mt-24">
     <!-- Header -->
     <div class="flex justify-between items-end mb-12">
         <div>
@@ -51,19 +88,24 @@
         </div>
     </div>
 
-    <!-- 🔽 FILTER TABS DINAMIS 🔽 -->
+    <!-- FILTER TABS DINAMIS -->
     <div class="mb-8 flex flex-wrap gap-4 justify-center">
-        <a href="/" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition">
+        <!-- Semua Kategori -->
+        <a href="{{ route('home') }}"
+            class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 {{ !request('category') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-slate-200 text-slate-800 hover:bg-slate-300' }}">
             Semua Kategori
         </a>
+
+        <!-- Dynamic Categories -->
         @foreach($categories as $cat)
-        <a href="/?category={{ $cat->slug }}" class="px-5 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl font-bold transition">
+        <a href="{{ route('home', ['category' => $cat->slug]) }}"
+            class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 {{ request('category') == $cat->slug ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200' }}">
             {{ $cat->name }}
         </a>
         @endforeach
     </div>
 
-    <!-- 🔽 EVENT GRID DINAMIS 🔽 -->
+    <!-- EVENT GRID DINAMIS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($events as $event)
         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
@@ -108,7 +150,9 @@
     </div>
 </section>
 
-<!-- ✅ Partner & Sponsor Section (SLIDER ANIMASI) -->
+<!-- ============================================ -->
+<!-- 3. PARTNER & SPONSOR SECTION (LOGIKA ASLI ANDA - DIPERTAHANKAN 100%) -->
+<!-- ============================================ -->
 @if(isset($partners) && $partners->count() > 0)
 @php
 $originalPartners = $partners->values();
@@ -123,10 +167,8 @@ while ($repeatedPartners->count() < 8) {
     $totalCount = $marqueePartners->count();
     @endphp
 
-    <!-- Background diubah menjadi gradient + pola dots -->
     <section class="py-16 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden border-t border-slate-100">
-
-        <!-- Dekorasi Pola Dots (CSS Background) -->
+        <!-- Dekorasi Pola Dots -->
         <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px;"></div>
 
         <div class="max-w-7xl mx-auto px-6 mb-12 text-center relative z-10">
@@ -157,6 +199,36 @@ while ($repeatedPartners->count() < 8) {
     </section>
 
     <style>
+        /* Animasi Blob untuk Hero Section */
+        @keyframes blob {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+
+        /* Animasi Slider Partner (Logika Asli Anda) */
         .slider {
             background: transparent;
             height: 140px;
@@ -169,7 +241,6 @@ while ($repeatedPartners->count() < 8) {
 
         .slider::before,
         .slider::after {
-            /* Gradient fade disesuaikan agar menyatu dengan background baru */
             background: linear-gradient(to right, rgba(248, 250, 252, 1) 0%, rgba(248, 250, 252, 0) 100%);
             content: "";
             height: 140px;
@@ -221,5 +292,4 @@ while ($repeatedPartners->count() < 8) {
         }
     </style>
     @endif
-
     @endsection

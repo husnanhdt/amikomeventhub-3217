@@ -10,14 +10,30 @@
                 class="w-full rounded-[2.5rem] shadow-2xl border-8 border-white">
 
             <!-- Organizer Info (Clickable) -->
-            <a href="{{ route('organizers.show', $event->partner_id ?? 1) }}" class="block mt-8 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition group">
+            <a href="{{ route('organizer.show', $event->partner_id ?? 1) }}" class="block mt-8 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition group">
                 <h4 class="font-bold mb-4 text-slate-900">Penyelenggara</h4>
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition">
-                        {{ substr($event->partner->name ?? 'EO', 0, 2) }}
+
+                    <!-- ✅ BAGIAN YANG DIUPDATE: Cek Logo atau Tampilkan Inisial -->
+                    <div class="w-12 h-12 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center group-hover:bg-indigo-600 transition flex-shrink-0 border-2 border-white shadow-sm">
+                        @if($event->partner && $event->partner->logo)
+                        <!-- Jika ada logo, tampilkan gambar -->
+                        <img src="{{ asset('storage/' . $event->partner->logo) }}"
+                            alt="{{ $event->partner->name }}"
+                            class="w-full h-full object-cover">
+                        @else
+                        <!-- Jika tidak ada logo, tampilkan 2 huruf awal nama -->
+                        <span class="text-indigo-600 font-bold group-hover:text-white transition text-sm">
+                            {{ strtoupper(substr($event->partner->name ?? 'EO', 0, 2)) }}
+                        </span>
+                        @endif
                     </div>
+                    <!-- ✅ AKHIR BAGIAN YANG DIUPDATE -->
+
                     <div>
-                        <p class="font-bold text-slate-800 group-hover:text-indigo-600 transition">{{ $event->partner->name ?? 'Event Organizer' }}</p>
+                        <p class="font-bold text-slate-800 group-hover:text-indigo-600 transition">
+                            {{ $event->partner->name ?? 'Event Organizer' }}
+                        </p>
                         <p class="text-xs text-slate-500 flex items-center gap-1">
                             <svg class="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>

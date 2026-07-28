@@ -4,72 +4,70 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class MidtransWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        $payload = $request->all();
-        $orderId = $payload['order_id'] ?? null;
-        $transactionStatus = $payload['transaction_status'] ?? null;
-        $fraudStatus = $payload['fraud_status'] ?? null;
+        // 1. Ambil raw payload JSON dari Midtrans
+        $payload = $request->getContent();
+        $notification = json_decode($payload);
 
-        if (!$orderId) {
+        if (!$notification || !isset($notification->order_id)) {
             return response()->json(['message' => 'Invalid payload'], 400);
         }
 
-        // Mencari ID transaksi tersebut di database lokal kita
-        $transaction = Transaction::with('event')->where('order_id', $orderId)->first();
+        // 2. Cari transaksi di database (dengan relasi event dan tickets)
+        $transaction = Transaction::with(['event', 'tickets'])->where('order_id', $notification->order_id)->first();
 
         if (!$transaction) {
             return response()->json(['message' => 'Transaction not found'], 404);
         }
 
-        // Cegah proses berulang jika status sudah lunas/sukses
-        if ($transaction->status === 'Success') {
+        // 3. Cegah proses berulang jika status sudah Success/Lunas
+        if (in_array(strtolower($transaction->status), ['success', 'paid', 'settlement'])) {
             return response()->json(['message' => 'Already processed']);
         }
 
-        // Logika Penerjemahan Status Midtrans API
-        if ($transactionStatus == 'capture') {
-            if ($fraudStatus == 'challenge') {
-                $transaction->status = 'Pending';
-            } else if ($fraudStatus == 'accept') {
-                $transaction->status = 'Success';
-                $this->processSuccess($transaction);
-            }
-        } else if ($transactionStatus == 'settlement') {
-            $transaction->status = 'Success';
-            $this->processSuccess($transaction);
-        } else if (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
-            $transaction->status = 'Expired';
-        } else if ($transactionStatus == 'pending') {
-            $transaction->status = 'Pending';
+        $status = $notification->transaction_status;
+        $fraud = $notification->fraud_status ?? null;
+
+        // 4. Tentukan status final berdasarkan logika Midtrans
+        $finalStatus = null;
+        if ($status == 'capture') {
+            $finalStatus = ($fraud == 'challenge') ? 'Pending' : 'Success';
+        } elseif ($status == 'settlement') {
+            $finalStatus = 'Success';
+        } elseif (in_array($status, ['cancel', 'deny', 'expire'])) {
+            $finalStatus = 'Expired';
+        } elseif ($status == 'pending') {
+            $finalStatus = 'Pending';
         }
 
-        $transaction->save();
-        return response()->json(['message' => 'OK']);
-    }
+        // 5. Update Transaksi DAN Tiket secara dinamis
+        if ($finalStatus) {
+            // Update status transaksi
+            $transaction->update(['status' => $finalStatus]);
 
-    private function processSuccess(Transaction $transaction)
-    {
-        $event = $transaction->event;
+            // ✅ UPDATE STATUS TIKET JUGA! (Ini yang membuat history tiket & dashboard organizer muncul)
+            $ticketStatus = ($finalStatus == 'Success') ? 'paid' : (($finalStatus == 'Pending') ? 'pending' : 'cancelled');
 
-        // Jika tiket masih ada dan terhubung dengan data event, kurangi jumlahnya sebanyak 1
-        if ($event && $event->stock > 0) {
-            $event->stock = $event->stock - 1;
-            $event->save();
+            $transaction->tickets()->update(['status' => $ticketStatus]);
 
-            // Mengirimkan email E-Ticket ke pelanggan
-            try {
-                Mail::to($transaction->customer_email)->send(new \App\Mail\EventTicketMail($transaction));
-            } catch (\Exception $e) {
-                Log::error('Gagal mengirim email E-Ticket: ' . $e->getMessage()); // ✅ Hapus backslash
+            // 6. Kirim Email E-Ticket jika pembayaran BERHASIL (Success)
+            if ($finalStatus == 'Success') {
+                try {
+                    Mail::to($transaction->customer_email)->send(new \App\Mail\EventTicketMail($transaction));
+                    Log::info('E-Ticket email sent successfully for order: ' . $transaction->order_id);
+                } catch (\Exception $e) {
+                    Log::error('Gagal mengirim email E-Ticket via Webhook: ' . $e->getMessage());
+                }
             }
-        } else {
-            Log::warning('Stock habis setelah pembayaran berhasil (Perlu proses refund opsional). Order: ' . $transaction->order_id); // ✅ Hapus backslash
         }
+
+        // 7. Beri respon ke Midtrans bahwa webhook sudah diterima
+        return response()->json(['message' => 'Webhook processed successfully']);
     }
 }

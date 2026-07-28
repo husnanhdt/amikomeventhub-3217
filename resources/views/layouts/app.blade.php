@@ -24,19 +24,29 @@
     <!-- Navigation -->
     <nav class="glass sticky top-8 z-40 mx-4 mt-4 px-6 py-4 rounded-2xl border border-white/20 shadow-lg flex justify-between items-center">
 
-        <!-- 1. BAGIAN KIRI: Logo -->
-        <div class="flex items-center gap-2">
+        <!-- Logo - Klik untuk refresh home -->
+        <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-80 transition">
             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
                 AH
             </div>
             <span class="text-xl font-bold tracking-tight hidden sm:block">AmikomEventHub</span>
-        </div>
+        </a>
+
 
         <!-- 2. BAGIAN TENGAH: Link Navigasi -->
         <div class="hidden md:flex gap-8 font-medium">
-            <a href="#events" class="text-indigo-600 font-semibold">{{ __('messages.explore') }}</a>
-            <a href="{{ route('katalog') }}" class="hover:text-indigo-600 transition">{{ __('messages.categories') }}</a>
-            <a href="{{ route('tentang') }}" class="hover:text-indigo-600 transition">{{ __('messages.about') }}</a>
+            <a href="{{ route('home') }}"
+                class="transition {{ request()->routeIs('home') ? 'text-indigo-600 font-semibold' : 'hover:text-indigo-600' }}">
+                {{ __('messages.explore') }}
+            </a>
+            <a href="{{ route('categories.index') }}"
+                class="transition {{ request()->routeIs('categories.*') ? 'text-indigo-600 font-semibold' : 'hover:text-indigo-600' }}">
+                {{ __('messages.categories') }}
+            </a>
+            <a href="{{ route('tentang-kami') }}"
+                class="transition {{ request()->routeIs('tentang-kami') ? 'text-indigo-600 font-semibold' : 'hover:text-indigo-600' }}">
+                Tentang Kami
+            </a>
         </div>
 
         <!-- 3. BAGIAN KANAN: Language Switcher + Auth Buttons -->
@@ -58,7 +68,19 @@
             @auth
             <!-- User Sudah Login -->
             <div class="flex items-center gap-4">
-                <!-- Link Transaksi (Langsung, bukan dropdown) -->
+
+                <!-- Menu Khusus Organizer -->
+                @if(auth()->user()->role === 'organizer' || auth()->user()->role === 'admin')
+                <a href="{{ route('organizer.dashboard') }}"
+                    class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span class="hidden sm:block">Dashboard Organizer</span>
+                </a>
+                @endif
+
+                <!-- Link Transaksi (untuk semua user) -->
                 <a href="{{ route('transaction.history') }}" class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -66,7 +88,7 @@
                     <span class="hidden sm:block">Transaksi</span>
                 </a>
 
-                <!-- Link Tiket (Langsung, bukan dropdown) -->
+                <!-- Link Tiket (untuk semua user) -->
                 <a href="{{ route('ticket.history') }}" class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
@@ -87,7 +109,7 @@
                         <img src="{{ $displayAvatar }}" class="w-9 h-9 rounded-full border-2 border-indigo-100 object-cover group-hover:scale-105 transition">
                         <span class="font-semibold text-sm hidden lg:block text-slate-700">{{ auth()->user()->name }}</span>
                     </button>
-                    
+
                     <!-- Dropdown Menu Profil -->
                     <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 hidden border border-slate-100" role="menu">
                         <a href="javascript:void(0)" onclick="openProfileModal(); closeProfileMenu();" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100" role="menuitem">Ubah Profil</a>
@@ -102,12 +124,9 @@
             @else
             <!-- User Belum Login -->
             <div class="flex items-center gap-3">
-                <!-- Tombol Masuk memicu Modal Login -->
                 <button onclick="openLoginModal()" class="px-5 py-2.5 rounded-xl font-semibold hover:bg-slate-200 transition cursor-pointer">
                     {{ __('messages.login') }}
                 </button>
-
-                <!-- Tombol Daftar memicu Modal Register -->
                 <button onclick="openRegisterModal()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition cursor-pointer">
                     {{ __('messages.register') }}
                 </button>
@@ -120,35 +139,80 @@
     @yield('content')
 
     <!-- Footer -->
-    <footer class="bg-indigo-900 text-indigo-100 py-20 px-6 mt-20">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div class="space-y-4 col-span-2">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-900 font-bold text-xl">
-                        AH
+    <footer class="bg-indigo-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+
+                <!-- Brand Section -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-900 font-bold text-xl">
+                            AH
+                        </div>
+                        <h3 class="text-xl font-bold">AmikomEventHub</h3>
                     </div>
-                    <span class="text-2xl font-bold text-white">AmikomEventHub</span>
+                    <p class="text-indigo-200 leading-relaxed">
+                        Platform reservasi tiket event online terbaik untuk mahasiswa dan penyelenggara profesional.
+                    </p>
                 </div>
-                <p class="max-w-xs text-indigo-300">Platform reservasi tiket event online terbaik untuk mahasiswa dan penyelenggara profesional.</p>
+
+                <!-- Navigasi Section -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider mb-6 text-indigo-200">Navigasi</h4>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="{{ route('home') }}" class="text-indigo-200 hover:text-white transition">
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('categories.index') }}" class="text-indigo-200 hover:text-white transition">
+                                Kategori
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('tentang-kami') }}" class="text-indigo-200 hover:text-white transition">
+                                Tentang Kami
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('how-to-order') }}" class="text-indigo-200 hover:text-white transition">
+                                Cara Bayar
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Kontak Section -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider mb-6 text-indigo-200">Kontak</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <a href="mailto:support@amikom.ac.id" class="text-indigo-200 hover:text-white transition">
+                                support@amikom.ac.id
+                            </a>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                            <a href="tel:+6281234567890" class="text-indigo-200 hover:text-white transition">
+                                +62 812 3456 7890
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6">Navigasi</h4>
-                <ul class="space-y-4">
-                    <li><a href="/" class="hover:text-white transition">Home</a></li>
-                    <li><a href="{{ route('katalog') }}" class="hover:text-white transition">Semua Event</a></li>
-                    <li><a href="#" class="hover:text-white transition">Cara Bayar</a></li>
-                </ul>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-8 border-t border-indigo-800 text-center">
+                <p class="text-indigo-300 text-sm">
+                    &copy; 2026 AmikomEventHub. Built with Laravel & Tailwind CSS.
+                </p>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6">Hubungi Kami</h4>
-                <ul class="space-y-4">
-                    <li>support@eventtiket.com</li>
-                    <li>+62 812 3456 7890</li>
-                </ul>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto pt-12 mt-12 border-t border-indigo-800 text-center text-indigo-400 text-sm">
-            &copy; 2026 AmikomEventHub. Built with Laravel & Tailwind CSS.
         </div>
     </footer>
 
@@ -290,6 +354,36 @@
                                 class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
                         </div>
 
+                        <!-- ✅ BARU: Tipe Akun -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Tipe Akun</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition">
+                                    <input type="radio" name="account_type" value="user" checked class="text-indigo-600 w-5 h-5">
+                                    <span class="text-sm font-medium">User Biasa</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition">
+                                    <input type="radio" name="account_type" value="organizer" class="text-indigo-600 w-5 h-5">
+                                    <span class="text-sm font-medium">Organizer</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">Pilih "Organizer" jika Anda mewakili HIMA/Kepanitiaan</p>
+                        </div>
+
+                        <!-- ✅ BARU: Jika pilih Organizer, tampilkan field tambahan -->
+                        <div id="organizerFields" class="hidden space-y-4 mt-4 p-4 bg-indigo-50 rounded-xl">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Organisasi/HIMA</label>
+                                <input type="text" name="organization_name" placeholder="Contoh: HIMA Sistem Informasi"
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Organisasi</label>
+                                <textarea name="organization_description" rows="3" placeholder="Ceritakan tentang organisasi Anda..."
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            </div>
+                        </div>
+
                         <!-- Jenis Kelamin -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Kelamin</label>
@@ -313,7 +407,7 @@
                                     <option value="">Tanggal</option>
                                     @for($i=1; $i<=31; $i++)
                                         <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ $i }}</option>
-                                    @endfor
+                                        @endfor
                                 </select>
                                 <select name="month" required class="px-3 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
                                     <option value="">Bulan</option>
@@ -399,10 +493,12 @@
                 </button>
 
                 <h3 class="text-xl font-bold text-center mb-6">Login dengan Email</h3>
-                <form action="#" method="POST" class="space-y-4">
+
+                <!-- ✅ SUDAH DIPERBAIKI -->
+                <form action="{{ route('login') }}" method="POST" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="password" name="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
                     <button type="submit" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition">Masuk</button>
                 </form>
             </div>
@@ -501,7 +597,7 @@
     <div id="passwordModal" class="fixed inset-0 z-50 hidden">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closePasswordModal()"></div>
-        
+
         <!-- Modal Content -->
         <div class="fixed inset-0 flex items-center justify-center p-4">
             <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 p-8">
@@ -551,13 +647,16 @@
         function openLoginModal() {
             document.getElementById('loginModal').classList.remove('hidden');
         }
+
         function closeLoginModal() {
             document.getElementById('loginModal').classList.add('hidden');
         }
+
         function showEmailLogin() {
             closeLoginModal();
             document.getElementById('emailLoginForm').classList.remove('hidden');
         }
+
         function closeEmailLogin() {
             document.getElementById('emailLoginForm').classList.add('hidden');
             openLoginModal();
@@ -567,6 +666,7 @@
         function openRegisterModal() {
             document.getElementById('registerModal').classList.remove('hidden');
         }
+
         function closeRegisterModal() {
             document.getElementById('registerModal').classList.add('hidden');
         }
@@ -575,6 +675,7 @@
         function openProfileModal() {
             document.getElementById('profileModal').classList.remove('hidden');
         }
+
         function closeProfileModal() {
             document.getElementById('profileModal').classList.add('hidden');
         }
@@ -583,6 +684,7 @@
         function openPasswordModal() {
             document.getElementById('passwordModal').classList.remove('hidden');
         }
+
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
         }
@@ -629,6 +731,7 @@
             const menu = document.getElementById('profileMenu');
             menu.classList.toggle('hidden');
         }
+
         function closeProfileMenu() {
             const menu = document.getElementById('profileMenu');
             menu.classList.add('hidden');
@@ -641,6 +744,18 @@
             if (menu && button && !button.contains(event.target) && !menu.contains(event.target)) {
                 menu.classList.add('hidden');
             }
+        });
+
+        // ✅ BARU: Toggle Organizer Fields
+        document.querySelectorAll('input[name="account_type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const organizerFields = document.getElementById('organizerFields');
+                if (this.value === 'organizer') {
+                    organizerFields.classList.remove('hidden');
+                } else {
+                    organizerFields.classList.add('hidden');
+                }
+            });
         });
     </script>
 

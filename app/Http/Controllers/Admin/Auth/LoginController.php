@@ -27,8 +27,9 @@ class LoginController extends Controller
 
             // Cek apakah user adalah admin
             $user = Auth::user();
-            if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
+            if (in_array($user->role, ['admin', 'superadmin'])) {
+                $request->session()->regenerate();
+                return redirect()->intended(route('admin.dashboard'));
             }
 
             // Jika bukan admin, logout & tampilkan error
