@@ -1,66 +1,171 @@
 @extends('layouts.organizer')
 
-@section('page_title', 'Riwayat Transaksi')
-@section('page_subtitle', 'Pantau semua transaksi masuk untuk event yang Anda kelola.')
+@section('page_title', 'Laporan Transaksi')
+@section('page_subtitle', 'Pantau arus kas dan penjualan tiket Anda.')
 
 @section('content')
-<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    @if($transactions->count() > 0)
+<!-- Alert Success -->
+@if(session('success'))
+<div class="bg-green-100 border border-green-200 text-green-700 px-6 py-4 rounded-2xl mb-6 flex items-center gap-3">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span class="font-bold">{{ session('success') }}</span>
+</div>
+@endif
+
+<!-- Header dengan Tombol di Kanan -->
+<header class="flex justify-end items-center mb-8">
+    <div class="flex gap-4">
+        <!-- ✅ UBAH MENJADI LINK DENGAN ROUTE -->
+        <a href="{{ route('organizer.transactions.export.excel', request()->query()) }}"
+            class="px-6 py-3 border-2 border-slate-200 rounded-2xl font-bold hover:bg-white hover:border-indigo-600 hover:text-indigo-600 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Ekspor Excel
+        </a>
+
+        <a href="{{ route('organizer.transactions.export.pdf', request()->query()) }}"
+            class="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Unduh PDF
+        </a>
+    </div>
+</header>
+
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <!-- Search & Filter -->
+    <div class="px-8 py-6 bg-slate-50/50 border-b flex flex-wrap gap-4 items-center">
+
+        <!--  Search Form -->
+        <div class="flex-1 min-w-[300px] flex gap-2">
+            <form method="GET" action="{{ route('organizer.transactions.index') }}" class="flex-1 flex gap-2">
+                <input type="text" name="search" placeholder="Cari Order ID, Nama, atau Email..."
+                    value="{{ request('search') }}"
+                    class="flex-1 px-5 py-3 rounded-xl border-slate-200 border bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm font-medium">
+                <button type="submit" class="px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">Cari</button>
+            </form>
+        </div>
+
+        <!-- 🎛️ Filter Controls -->
+        <div class="flex gap-2">
+
+            <!-- ✅ Status Filter (Form yang berfungsi) -->
+            <form method="GET" action="{{ route('organizer.transactions.index') }}" class="flex gap-2">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+
+                <select name="status" onchange="this.form.submit()" class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold cursor-pointer">
+                    <option value="">Semua Status</option>
+                    <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }} class="text-orange-600">Pending</option>
+                    <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }} class="text-green-600">Success</option>
+                    <option value="Expired" {{ request('status') == 'Expired' ? 'selected' : '' }} class="text-rose-600">Expired</option>
+                </select>
+            </form>
+
+            <!-- 📅 Date Filter (Form yang berfungsi) -->
+            <form method="GET" action="{{ route('organizer.transactions.index') }}" class="flex gap-2">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <input type="hidden" name="status" value="{{ request('status') }}">
+
+                <select name="date_filter" onchange="this.form.submit()" class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold cursor-pointer">
+                    <option value="" {{ request('date_filter') == '' ? 'selected' : '' }}>Semua Waktu</option>
+                    <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+                    <option value="month" {{ request('date_filter') == 'month' ? 'selected' : '' }}>Bulan Ini</option>
+                    <option value="last_month" {{ request('date_filter') == 'last_month' ? 'selected' : '' }}>Bulan Lalu</option>
+                    <option value="year" {{ request('date_filter') == 'year' ? 'selected' : '' }}>Tahun {{ date('Y') }}</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table dengan Layout Mirip Admin -->
     <div class="overflow-x-auto">
-        <table class="w-full text-left">
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] font-black tracking-widest">
                 <tr>
-                    <th class="px-6 py-4">Order ID</th>
-                    <th class="px-6 py-4">Event</th>
-                    <th class="px-6 py-4">Pembeli</th>
-                    <th class="px-6 py-4">Tanggal</th>
-                    <th class="px-6 py-4">Total</th>
-                    <th class="px-6 py-4">Status</th>
+                    <th class="px-8 py-4">NO</th>
+                    <th class="px-8 py-4">ORDER ID</th>
+                    <th class="px-8 py-4">DETAIL PEMBELI</th>
+                    <th class="px-8 py-4">EVENT</th>
+                    <th class="px-8 py-4">TGL TRANSAKSI</th>
+                    <th class="px-8 py-4">STATUS</th>
+                    <th class="px-8 py-4">TOTAL TAGIHAN</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
-                @foreach($transactions as $trx)
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="px-6 py-4 font-mono text-sm text-slate-600">{{ $trx->order_id }}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-900 max-w-xs truncate">{{ $trx->event->title ?? '-' }}</td>
-                    <td class="px-6 py-4 text-sm text-slate-600">
-                        <div class="font-medium">{{ $trx->customer_name }}</div>
-                        <div class="text-xs text-slate-400">{{ $trx->customer_email }}</div>
+            <tbody class="divide-y border-t">
+                @forelse($transactions as $index => $trx)
+                <tr class="hover:bg-slate-50/50 transition">
+                    <td class="px-8 py-6 font-bold text-slate-400">
+                        {{ $transactions->firstItem() + $index }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-slate-600 whitespace-nowrap">{{ $trx->created_at->format('d M Y, H:i') }}</td>
-                    <td class="px-6 py-4 font-bold text-indigo-600 whitespace-nowrap">Rp {{ number_format($trx->total_price, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4">
+                    <td class="px-8 py-6">
+                        <span class="font-mono font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-sm">
+                            #{{ $trx->order_id }}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <p class="font-bold text-slate-800">{{ $trx->customer_name }}</p>
+                        <p class="text-xs text-slate-500">{{ $trx->customer_email }}</p>
+                    </td>
+                    <td class="px-8 py-6">
+                        <p class="font-medium text-slate-700">{{ $trx->event->title ?? '-' }}</p>
+                    </td>
+                    <td class="px-8 py-6 text-sm text-slate-500">
+                        {{ \Carbon\Carbon::parse($trx->created_at)->locale('id')->isoFormat('D MMMM YYYY, HH:mm') }}
+                    </td>
+                    </td>
+                    <td class="px-8 py-6">
                         @php
-                            $status = strtolower($trx->status);
+                        // Ubah status jadi huruf kecil semua agar pengecekan lebih akurat
+                        $statusLower = strtolower($trx->status);
                         @endphp
-                        @if(in_array($status, ['success', 'paid', 'settlement']))
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase">Success</span>
-                        @elseif($status === 'pending')
-                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold uppercase">Pending</span>
+
+                        {{-- Jika statusnya success, settlement, atau capture, tampilkan HIJAU --}}
+                        @if(in_array($statusLower, ['success', 'settlement', 'capture']))
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold uppercase ring-1 ring-green-200">
+                            Success
+                        </span>
+
+                        {{-- Jika statusnya pending, tampilkan ORANYE --}}
+                        @elseif(in_array($statusLower, ['pending']))
+                        <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs font-bold uppercase ring-1 ring-orange-200">
+                            Pending
+                        </span>
+
+                        {{-- Selain itu (expire, cancel, deny, failed), tampilkan MERAH --}}
                         @else
-                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase">{{ $trx->status }}</span>
+                        <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-lg text-xs font-bold uppercase ring-1 ring-rose-200">
+                            {{ ucfirst($statusLower) }}
+                        </span>
                         @endif
                     </td>
+                    <td class="px-8 py-6 text-right">
+                        <p class="font-black text-slate-900">Rp {{ number_format($trx->total_price, 0, ',', '.') }}</p>
+                    </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="7" class="px-8 py-10 text-center text-slate-500">
+                        Belum ada transaksi
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-    
+
     <!-- Pagination -->
-    <div class="px-6 py-4 border-t border-slate-100">
-        {{ $transactions->links() }}
-    </div>
-    @else
-    <!-- Empty State -->
-    <div class="text-center py-16 px-6">
-        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-            </svg>
+    @if($transactions->hasPages())
+    <div class="px-8 py-6 bg-slate-50/50 border-t flex justify-between items-center">
+        <p class="text-sm text-slate-500 font-medium">
+            Menampilkan {{ $transactions->firstItem() ?? 0 }} - {{ $transactions->lastItem() ?? 0 }} dari {{ $transactions->total() }} transaksi
+        </p>
+        <div class="flex gap-2">
+            {{ $transactions->links() }}
         </div>
-        <h4 class="text-lg font-bold text-slate-900 mb-2">Belum Ada Transaksi</h4>
-        <p class="text-slate-500 max-w-sm mx-auto">Belum ada transaksi yang masuk untuk event-event yang Anda kelola.</p>
     </div>
     @endif
 </div>

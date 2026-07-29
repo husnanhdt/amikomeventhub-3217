@@ -14,7 +14,7 @@ class PartnerController extends Controller
         $query = Partner::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'ILIKE', '%' . $request->search . '%');
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         $partners = $query->latest()->paginate(10);

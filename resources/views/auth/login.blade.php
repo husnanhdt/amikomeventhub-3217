@@ -13,7 +13,7 @@
         backdrop-filter: blur(4px);
         z-index: 9999;
     }
-    
+
     /* Hide navbar saat di halaman login */
     nav {
         display: none !important;
@@ -22,18 +22,18 @@
 
 <!-- Overlay dengan Blur -->
 <div class="login-overlay flex items-center justify-center p-4">
-    
+
     <!-- Modal Content -->
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10">
-        
+
         <!-- Close Button -->
-        <a href="/" 
-           class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
+        <a href="/"
+            class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
             <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </a>
-        
+
         <!-- Modal Body -->
         <div class="p-8">
             <div class="text-center mb-8">
@@ -52,14 +52,14 @@
 
             <!-- Login Options -->
             <div class="space-y-3">
-                <a href="{{ route('auth.google.redirect') }}" 
-                   class="w-full flex items-center justify-center gap-3 px-6 py-4 border-2 border-slate-200 rounded-2xl font-semibold hover:bg-slate-50 transition group">
+                <a href="{{ route('auth.google.redirect') }}"
+                    class="w-full flex items-center justify-center gap-3 px-6 py-4 border-2 border-slate-200 rounded-2xl font-semibold hover:bg-slate-50 transition group">
                     <img src="https://www.google.com/favicon.ico" class="w-5 h-5">
                     <span class="text-slate-700 group-hover:text-slate-900">{{ __('messages.continue_google') }}</span>
                 </a>
 
-                <button onclick="showEmailLogin()" 
-                        class="w-full flex items-center justify-center gap-3 px-6 py-4 border-2 border-slate-200 rounded-2xl font-semibold hover:bg-slate-50 transition group">
+                <button onclick="showEmailLogin()"
+                    class="w-full flex items-center justify-center gap-3 px-6 py-4 border-2 border-slate-200 rounded-2xl font-semibold hover:bg-slate-50 transition group">
                     <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
@@ -75,14 +75,14 @@
             </div>
 
             <p class="text-center mt-6 text-sm text-slate-600">
-                {{ __('messages.no_account') }} 
+                {{ __('messages.no_account') }}
                 <a href="{{ route('user.register') }}" class="text-indigo-600 font-bold hover:underline">
                     {{ __('messages.register') }}
                 </a>
             </p>
 
             <p class="text-xs text-slate-400 text-center mt-6">
-                Dengan menggunakan website ini, membeli tiket, atau membuat akun, Anda setuju dengan 
+                Dengan menggunakan website ini, membeli tiket, atau membuat akun, Anda setuju dengan
                 <a href="#" class="text-indigo-600 hover:underline">{{ __('messages.terms') }}</a>
             </p>
         </div>
@@ -99,14 +99,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
-            
+
             <h3 class="text-xl font-bold text-center mb-6">Login dengan Email</h3>
             <form action="#" method="POST" class="space-y-4">
                 @csrf
-                <input type="email" name="email" placeholder="Email" 
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
-                <input type="password" name="password" placeholder="Password" 
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="email" name="email" placeholder="Email"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="password" name="password" placeholder="Password"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
                 <button type="submit" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition">
                     Masuk
                 </button>
@@ -116,12 +116,12 @@
 </div>
 
 <script>
-function showEmailLogin() {
-    document.getElementById('emailLoginForm').classList.remove('hidden');
-}
+    function showEmailLogin() {
+        document.getElementById('emailLoginForm').classList.remove('hidden');
+    }
 
-function closeEmailLogin() {
-    document.getElementById('emailLoginForm').classList.add('hidden');
-}
+    function closeEmailLogin() {
+        document.getElementById('emailLoginForm').classList.add('hidden');
+    }
 </script>
 @endsection

@@ -173,7 +173,7 @@
             <div class="flex items-center gap-4">
                 <div class="text-right hidden md:block">
                     <p class="font-bold">{{ auth()->user()->name ?? 'Admin' }}</p>
-                    <p class="text-xs text-slate-400">Penyelenggara</p>
+                    <p class="text-xs text-slate-400">Admin Penyelenggara</p>
                 </div>
                 <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border flex items-center justify-center p-1">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'Admin') }}&background=6366f1&color=fff" class="rounded-xl" alt="Avatar">

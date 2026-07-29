@@ -47,11 +47,11 @@
 
                 <!-- Kelola Event -->
                 <a href="{{ route('organizer.events.index') }}"
-                    class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('organizer.events.*') ? 'bg-indigo-800 text-white' : 'hover:bg-indigo-800' }} rounded-xl font-bold transition">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg transition {{ request()->routeIs('organizer.events.*') ? 'bg-white/10' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    Kelola Event
+                    <span>Kelola Event</span>
                 </a>
 
                 <!-- Laporan Transaksi -->
@@ -102,7 +102,7 @@
 
             <!-- User Info & Logout -->
             <!-- Lihat Website -->
-            <a href="{{ route('home') }}" target="_blank"
+            <a href="{{ route('home') }}"
                 class="flex items-center gap-3 px-4 py-3 text-indigo-200 hover:text-white hover:bg-indigo-800 rounded-xl transition font-medium mx-2 mb-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>

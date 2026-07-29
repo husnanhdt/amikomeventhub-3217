@@ -8,12 +8,20 @@
 <!-- Header dengan Tombol di Kanan -->
 <header class="flex justify-end items-center mb-10">
     <div class="flex gap-4">
-        <button class="px-6 py-3 border-2 border-slate-200 rounded-2xl font-bold hover:bg-white hover:border-indigo-600 hover:text-indigo-600 transition">
+        <!-- ✅ UBAH MENJADI LINK (A) DENGAN ROUTE -->
+        <a href="{{ route('admin.transactions.export.excel', request()->query()) }}" class="px-6 py-3 border-2 border-slate-200 rounded-2xl font-bold hover:bg-white hover:border-indigo-600 hover:text-indigo-600 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
             Ekspor Excel
-        </button>
-        <button class="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition">
+        </a>
+
+        <a href="{{ route('admin.transactions.export.pdf', request()->query()) }}" class="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
             Unduh PDF
-        </button>
+        </a>
     </div>
 </header>
 
@@ -46,12 +54,19 @@
                 </select>
             </form>
 
-            <!-- 📅 Date Filter (Opsional - Static untuk sekarang) -->
-            <select class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold">
-                <option>Bulan Ini</option>
-                <option>Bulan Lalu</option>
-                <option>Tahun 2024</option>
-            </select>
+            <!--  Date Filter (Form yang berfungsi) -->
+<form method="GET" action="{{ route('admin.transactions.index') }}" class="flex gap-2">
+    <input type="hidden" name="search" value="{{ request('search') }}">
+    <input type="hidden" name="status" value="{{ request('status') }}">
+    
+    <select name="date_filter" onchange="this.form.submit()" class="px-5 py-3 rounded-xl border-slate-200 border bg-white outline-none text-sm font-bold cursor-pointer">
+        <option value="" {{ request('date_filter') == '' ? 'selected' : '' }}>Semua Waktu</option>
+        <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+        <option value="month" {{ request('date_filter') == 'month' ? 'selected' : '' }}>Bulan Ini</option>
+        <option value="last_month" {{ request('date_filter') == 'last_month' ? 'selected' : '' }}>Bulan Lalu</option>
+        <option value="year" {{ request('date_filter') == 'year' ? 'selected' : '' }}>Tahun {{ date('Y') }}</option>
+    </select>
+</form>
         </div>
     </div>
 
@@ -86,10 +101,9 @@
                     </td>
                     <td class="px-8 py-6">
                         <p class="font-medium text-slate-700">{{ $trx->event->title ?? '-' }}</p>
-                        <p class="text-xs text-slate-400">{{ \Carbon\Carbon::parse($trx->created_at)->format('d M Y') }}</p>
                     </td>
                     <td class="px-8 py-6 text-sm text-slate-500">
-                        {{ \Carbon\Carbon::parse($trx->created_at)->format('H:i') }}
+                        {{ \Carbon\Carbon::parse($trx->created_at)->locale('id')->isoFormat('D MMMM YYYY, HH:mm') }}
                     </td>
                     <td class="px-8 py-6">
                         @php

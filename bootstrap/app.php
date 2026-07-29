@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'organizer' => \App\Http\Middleware\IsOrganizer::class,
             'superadmin' => \App\Http\Middleware\IsSuperadmin::class,
+            'organizer.approved' => \App\Http\Middleware\CheckOrganizerApproved::class,
         ]);
 
         // 2. PERTAHANKAN PENGECUALIAN CSRF MIDTRANS (Punya kamu yang sudah benar)

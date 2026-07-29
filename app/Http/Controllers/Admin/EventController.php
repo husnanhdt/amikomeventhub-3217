@@ -11,14 +11,30 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
-    // READ: Tampilkan daftar event dengan pagination
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('category')
-            ->latest()
-            ->paginate(10);
+        // Query dasar event
+        $query = Event::with('category');
 
-        return view('admin.events.index', compact('events'));
+        // ✅ Fitur Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        // ✅ Fitur Filter Kategori
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Eksekusi query dengan pagination
+        $events = $query->latest()->paginate(10);
+
+        // ✅ INI YANG KURANG: Ambil semua kategori untuk dropdown filter
+        $categories = \App\Models\Category::all();
+
+        // Kirim kedua variabel ke view
+        return view('admin.events.index', compact('events', 'categories'));
     }
 
     // CREATE: Tampilkan form tambah event

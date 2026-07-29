@@ -3,96 +3,90 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Event;
 use App\Models\Transaction;
-use App\Models\User; // ✅ TAMBAHKAN untuk grafik user
-use Illuminate\Support\Facades\DB; // ✅ TAMBAHKAN untuk raw query
-use Carbon\Carbon; // ✅ TAMBAHKAN untuk manipulasi tanggal
+use App\Models\Partner;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // ============================================
-        // LOGIKA ASLI ANDA (DIPERTAHANKAN 100%)
-        // ============================================
+        // 1. Statistik Dasar
+        $totalRevenue = Transaction::whereIn('status', ['success', 'paid', 'settlement'])->sum('total_price');
         
-        // 1. Menjumlahkan semua nominal total_price dari kolom Transaksi Lunas
-        $totalRevenue = Transaction::whereIn('status', ['settlement', 'success'])->sum('total_price');
+        // ✅ DIPERBAIKI: Karena kolom 'quantity' tidak ada di tabel transactions, 
+        // kita gunakan count() untuk menghitung jumlah transaksi sukses sebagai tiket terjual.
+        // (Menggunakan ?? tidak berhasil mencegah error karena sum() langsung melempar exception jika kolom tidak ada)
+        $ticketsSold = Transaction::whereIn('status', ['success', 'paid', 'settlement'])->count();
         
-        // 2. Menghitung Berapa orang tamu yang tiketnya sudah Lunas
-        $ticketsSold = Transaction::whereIn('status', ['settlement', 'success'])->count();
-        
-        // 3. Menghitung Jumlah Acara Mendatang yang aktif diselenggarakan
         $activeEvents = Event::where('date', '>=', now())->count();
-        
-        // 4. Menghitung Transaksi Ngadat (Status belum dibayar pelanggan / Expired)
         $pendingOrders = Transaction::where('status', 'pending')->count();
+
+        // 2. Data untuk Grafik Pertumbuhan User (6 Bulan Terakhir)
+        $userGrowthLabels = [];
+        $userGrowthData = [];
         
-        // 5. Menyertakan 5 daftar riwayat pesanan (History) paling mutakhir di panel
-        $recentTransactions = Transaction::with('event')->latest()->take(5)->get();
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $userGrowthLabels[] = $date->format('M Y');
+            
+            $userGrowthData[] = User::whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->count();
+        }
 
-        // ============================================
-        // ✅ DATA BARU UNTUK GRAFIK (TAMBAHAN)
-        // ============================================
+        // 3. Data untuk Grafik Pendapatan per Event (Top 5)
+        $topEvents = Event::withSum(['transactions as revenue' => function($query) {
+            $query->whereIn('status', ['success', 'paid', 'settlement']);
+        }], 'total_price')
+        ->orderByDesc('revenue')
+        ->take(5)
+        ->get();
 
-        // 1. Grafik Pertumbuhan User (6 bulan terakhir)
-        $userGrowth = User::select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
-            )
-            ->where('created_at', '>=', Carbon::now()->subMonths(6))
-            ->groupBy('month')
-            ->orderBy('month')
+        $revenueByEventLabels = $topEvents->pluck('title')->toArray();
+        $revenueByEventData = $topEvents->pluck('revenue')->toArray();
+
+        // Fallback jika tidak ada data
+        if (empty($revenueByEventLabels)) {
+            $revenueByEventLabels = ['Belum ada data'];
+            $revenueByEventData = [0];
+        }
+
+        // 4. Data untuk Grafik Pie Chart Status Transaksi
+        $statusData = [
+            Transaction::whereIn('status', ['success', 'settlement'])->count(),
+            Transaction::where('status', 'pending')->count(),
+            Transaction::whereIn('status', ['expire', 'failed', 'cancel', 'deny'])->count(),
+        ];
+
+        $statusLabels = ['Success', 'Pending', 'Failed'];
+
+        // Fallback untuk pie chart
+        if (array_sum($statusData) === 0) {
+            $statusData = [0, 0, 1];
+            $statusLabels = ['Success', 'Pending', 'Failed'];
+        }
+
+        // 5. Transaksi Terakhir (10 terbaru)
+        $recentTransactions = Transaction::with(['user', 'event'])
+            ->latest()
+            ->take(10)
             ->get();
 
-        // Format untuk Chart.js
-        $userGrowthLabels = $userGrowth->pluck('month')->map(function($month) {
-            return Carbon::parse($month . '-01')->format('M Y');
-        })->toArray();
-
-        $userGrowthData = $userGrowth->pluck('count')->toArray();
-
-        // 2. Grafik Pendapatan per Event (Top 5)
-        $revenueByEvent = Transaction::select(
-                'events.title as event_title',
-                DB::raw('SUM(transactions.total_price) as total_revenue')
-            )
-            ->join('events', 'transactions.event_id', '=', 'events.id')
-            ->whereIn('transactions.status', ['settlement', 'success'])
-            ->groupBy('events.title')
-            ->orderByDesc('total_revenue')
-            ->take(5)
-            ->get();
-
-        $revenueByEventLabels = $revenueByEvent->pluck('event_title')->toArray();
-        $revenueByEventData = $revenueByEvent->pluck('total_revenue')->toArray();
-
-        // 3. Grafik Status Transaksi (Pie Chart)
-        $transactionStatus = Transaction::select('status', DB::raw('COUNT(*) as count'))
-            ->groupBy('status')
-            ->get();
-
-        $statusLabels = $transactionStatus->pluck('status')->toArray();
-        $statusData = $transactionStatus->pluck('count')->toArray();
-
-        // ============================================
-        // KIRIM SEMUA DATA KE VIEW
-        // ============================================
         return view('admin.dashboard', compact(
-            // Data asli Anda
             'totalRevenue',
             'ticketsSold',
             'activeEvents',
             'pendingOrders',
-            'recentTransactions',
-            // Data grafik tambahan
             'userGrowthLabels',
             'userGrowthData',
             'revenueByEventLabels',
             'revenueByEventData',
             'statusLabels',
-            'statusData'
+            'statusData',
+            'recentTransactions'
         ));
     }
 }

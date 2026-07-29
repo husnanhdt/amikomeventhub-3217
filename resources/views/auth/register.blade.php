@@ -56,6 +56,18 @@
         <!-- Modal Body - Scrollable Content jika form terlalu panjang -->
         <div class="p-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
             
+            <!-- ✅ INI YANG KURANG: TAMPILAN ERROR VALIDASI (AKAN MUNCUL JIKA ADA YANG SALAH) -->
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm font-semibold">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <!-- ========================================================== -->
+
             <!-- Header -->
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-3">
@@ -85,6 +97,9 @@
             <form action="{{ route('register.post') }}" method="POST" class="space-y-4">
                 @csrf
                 
+                <!-- Hidden input agar controller tidak error mencari account_type -->
+                <input type="hidden" name="account_type" value="user">
+
                 <!-- Nama Lengkap -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>

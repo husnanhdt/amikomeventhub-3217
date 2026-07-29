@@ -28,7 +28,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\OrganizerController as AdminOrganizerController;
-use App\Http\Controllers\Admin\ReviewController as AdminReviewController; 
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 // Organizer Controllers
 use App\Http\Controllers\Organizer\DashboardController as OrganizerDashboardController;
@@ -106,16 +106,19 @@ Route::post('/login', function (Request $request) {
         $request->session()->regenerate();
         $user = Auth::user();
 
-        // Redirect berdasarkan role
+        // Hapus intended URL agar tidak bentrok dengan role redirect
+        session()->forget('url.intended');
+
+        // Redirect berdasarkan role (PAKSA, tidak pakai intended)
         if ($user->role === 'superadmin') {
-            return redirect()->intended(route('superadmin.dashboard'));
+            return redirect()->route('superadmin.dashboard');
         } elseif ($user->role === 'admin') {
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->route('admin.dashboard');
         } elseif ($user->role === 'organizer') {
-            return redirect()->intended(route('organizer.dashboard'));
+            return redirect()->route('organizer.dashboard');
         }
 
-        return redirect()->intended(route('home'));
+        return redirect()->route('home');
     }
 
     return back()->withErrors([
@@ -196,25 +199,41 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('events', AdminEventController::class);
+        Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('transactions/export-excel', [TransactionController::class, 'exportExcel'])->name('transactions.export.excel');
+        Route::get('transactions/export-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export.pdf');
     });
 
+    // Organizer Management
     Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
+    Route::get('/organizers/create', [AdminOrganizerController::class, 'create'])->name('organizers.create');
+    Route::post('/organizers', [AdminOrganizerController::class, 'store'])->name('organizers.store');
     Route::get('/organizers/{id}/edit', [AdminOrganizerController::class, 'edit'])->name('organizers.edit');
+    Route::put('/organizers/{id}', [AdminOrganizerController::class, 'update'])->name('organizers.update');
     Route::delete('/organizers/{id}', [AdminOrganizerController::class, 'destroy'])->name('organizers.destroy');
 
-        Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
-Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
-        Route::get('/users', function () {
-            return view('admin.users.index'); // Nanti diganti dengan controller
-        })->name('users.index');
+    Route::get('/users', function () {
+        return view('admin.users.index'); // Nanti diganti dengan controller
+    })->name('users.index');
 
-        Route::get('/settings', function () {
-            return view('admin.settings'); // Nanti diganti dengan controller
-        })->name('settings');
+    // Route untuk MENAMPILKAN halaman settings (GET)
+    Route::get('/settings', function () {
+        return view('admin.settings');
+    })->name('settings');
+
+    // ✅ BARU: Route untuk MENYIMPAN data settings (POST)
+    Route::post('/settings', function (\Illuminate\Http\Request $request) {
+        // Nanti di sini logika untuk save ke database atau config
+        // Untuk sekarang, kita kembalikan ke halaman sebelumnya dengan pesan sukses
+        return back()->with('success', 'Pengaturan sistem berhasil diperbarui!');
+    })->name('settings.update');
 });
 
 /*
@@ -231,12 +250,20 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'organizer']
     Route::get('/profile', [\App\Http\Controllers\Organizer\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Organizer\ProfileController::class, 'update'])->name('profile.update');
 
-Route::get('/tickets', [\App\Http\Controllers\Organizer\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets', [\App\Http\Controllers\Organizer\TicketController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/{event}', [\App\Http\Controllers\Organizer\TicketController::class, 'show'])->name('tickets.show');
-    
+
     Route::get('/reviews', [\App\Http\Controllers\Organizer\ReviewController::class, 'index'])->name('reviews.index');
-    
-    Route::get('/statistics', [\App\Http\Controllers\Organizer\StatisticsController::class, 'index'])->name('statistics.index');            
+
+    Route::get('/statistics', [\App\Http\Controllers\Organizer\StatisticsController::class, 'index'])->name('statistics.index');
+    Route::get('/events', [OrganizerEventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [OrganizerEventController::class, 'create'])->name('events.create');
+    Route::post('/events', [OrganizerEventController::class, 'store'])->name('events.store');
+    Route::get('/events/{id}/edit', [OrganizerEventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{id}', [OrganizerEventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{id}', [OrganizerEventController::class, 'destroy'])->name('events.destroy');
+    Route::get('/transactions/export-excel', [OrganizerTransactionController::class, 'exportExcel'])->name('transactions.export.excel');
+    Route::get('/transactions/export-pdf', [OrganizerTransactionController::class, 'exportPdf'])->name('transactions.export.pdf');
 });
 
 Route::get('/organizer/{partner}', [OrganizerController::class, 'show'])->name('organizer.show');
@@ -280,51 +307,74 @@ Route::get('/kategori/{slug}', function ($slug) {
 |--------------------------------------------------------------------------
 */
 Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'superadmin'])->group(function () {
-    Route::get('/dashboard', function () {
-        $stats = [
-            'total_users' => \App\Models\User::count(),
-            'total_organizers' => \App\Models\User::where('role', 'organizer')->count(),
-            'total_admins' => \App\Models\User::where('role', 'admin')->count(),
-            'total_events' => \App\Models\Event::count(),
-            'total_revenue' => \App\Models\Transaction::whereIn('status', ['success', 'paid', 'settlement'])->sum('total_price'),
-            'pending_partners' => \App\Models\Partner::where('status', 'pending')->count(),
-        ];
-        
-        $recentActivities = \App\Models\Transaction::with(['user', 'event'])
-            ->latest()
-            ->take(10)
-            ->get();
-        
-        return view('superadmin.dashboard', compact('stats', 'recentActivities'));
-    })->name('dashboard');
     
-    // Manage Users
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Superadmin\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/transactions', [\App\Http\Controllers\Superadmin\TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/export-excel', [\App\Http\Controllers\Superadmin\TransactionController::class, 'exportExcel'])->name('transactions.export.excel');
+    Route::get('/transactions/export-pdf', [\App\Http\Controllers\Superadmin\TransactionController::class, 'exportPdf'])->name('transactions.export.pdf');
+    Route::get('/transactions/{id}', [\App\Http\Controllers\Superadmin\TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('/transactions/{id}/print', [\App\Http\Controllers\Superadmin\TransactionController::class, 'printTicket'])->name('transactions.print');
+    
+    // ✅ KELOLA ORGANISASI
+    Route::get('/organizations', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'index'])->name('organizations.index');
+    Route::get('/organizations/{id}', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'show'])->name('organizations.show');
+    Route::get('/organizations/{id}/edit', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'edit'])->name('organizations.edit');
+    Route::put('/organizations/{id}', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'update'])->name('organizations.update');
+    Route::post('/organizations/{id}/approve', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'approve'])->name('organizations.approve');
+    Route::post('/organizations/{id}/reject', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'reject'])->name('organizations.reject');
+    Route::delete('/organizations/{id}', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'destroy'])->name('organizations.destroy');
+    Route::get('/organizations/export', [\App\Http\Controllers\Superadmin\OrganizationController::class, 'export'])->name('organizations.export');
+
+// Kategori (CRUD)
+    Route::get('/categories', [\App\Http\Controllers\Superadmin\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [\App\Http\Controllers\Superadmin\CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [\App\Http\Controllers\Superadmin\CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{id}/edit', [\App\Http\Controllers\Superadmin\CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{id}', [\App\Http\Controllers\Superadmin\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [\App\Http\Controllers\Superadmin\CategoryController::class, 'destroy'])->name('categories.destroy');
+
+// ✅ KELOLA PARTNER
+    Route::get('/partners', [\App\Http\Controllers\Superadmin\PartnerController::class, 'index'])->name('partners.index');
+    Route::post('/partners/{id}/approve', [\App\Http\Controllers\Superadmin\PartnerController::class, 'approve'])->name('partners.approve');
+    Route::post('/partners/{id}/reject', [\App\Http\Controllers\Superadmin\PartnerController::class, 'reject'])->name('partners.reject');
+    Route::get('/partners/{id}', [\App\Http\Controllers\Superadmin\PartnerController::class, 'show'])->name('partners.show');
+    Route::delete('/partners/{id}', [\App\Http\Controllers\Superadmin\PartnerController::class, 'destroy'])->name('partners.destroy');
+
+     // ✅ REVIEW & MODERASI
+    Route::get('/reviews', [\App\Http\Controllers\Superadmin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{id}', [\App\Http\Controllers\Superadmin\ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{id}/approve', [\App\Http\Controllers\Superadmin\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{id}/reject', [\App\Http\Controllers\Superadmin\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{id}', [\App\Http\Controllers\Superadmin\ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/reviews/bulk-action', [\App\Http\Controllers\Superadmin\ReviewController::class, 'bulkAction'])->name('reviews.bulk-action');
+    Route::get('/reviews/export', [\App\Http\Controllers\Superadmin\ReviewController::class, 'export'])->name('reviews.export');
+
+    // ✅ PENGELOLA PENGURUS/ADMIN
+    Route::get('/admins', [\App\Http\Controllers\Superadmin\AdminController::class, 'index'])->name('admins.index');
+    Route::get('/admins/create', [\App\Http\Controllers\Superadmin\AdminController::class, 'create'])->name('admins.create');
+    Route::post('/admins', [\App\Http\Controllers\Superadmin\AdminController::class, 'store'])->name('admins.store');
+    Route::get('/admins/{id}', [\App\Http\Controllers\Superadmin\AdminController::class, 'show'])->name('admins.show');
+    Route::get('/admins/{id}/edit', [\App\Http\Controllers\Superadmin\AdminController::class, 'edit'])->name('admins.edit');
+    Route::put('/admins/{id}', [\App\Http\Controllers\Superadmin\AdminController::class, 'update'])->name('admins.update');
+    Route::delete('/admins/{id}', [\App\Http\Controllers\Superadmin\AdminController::class, 'destroy'])->name('admins.destroy');
+    Route::post('/admins/{id}/reset-password', [\App\Http\Controllers\Superadmin\AdminController::class, 'resetPassword'])->name('admins.reset-password');
+
+    // ✅ PASTIKAN ROUTE INI ADA:
+    Route::get('/events', [OrganizerEventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [OrganizerEventController::class, 'create'])->name('events.create');
+    Route::post('/events', [OrganizerEventController::class, 'store'])->name('events.store');
+    Route::get('/events/{id}/edit', [OrganizerEventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{id}', [OrganizerEventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{id}', [OrganizerEventController::class, 'destroy'])->name('events.destroy');
+    
+
+    // Manage Users (Opsional, bisa dikembangkan nanti)
     Route::get('/users', function () {
         $users = \App\Models\User::with('partner')->latest()->paginate(20);
         return view('superadmin.users.index', compact('users'));
     })->name('users.index');
-    
-    // Manage Organizers (Approve/Reject)
-    Route::get('/organizers', function () {
-        $organizers = \App\Models\User::where('role', 'organizer')
-            ->with('partner')
-            ->latest()
-            ->paginate(20);
-        return view('superadmin.organizers.index', compact('organizers'));
-    })->name('organizers.index');
-    
-    Route::post('/organizers/{id}/approve', function ($id) {
-        $user = \App\Models\User::findOrFail($id);
-        if ($user->partner) {
-            $user->partner->update(['status' => 'approved']);
-        }
-        return back()->with('success', 'Organizer disetujui');
-    })->name('organizers.approve');
-    
-    // System Settings
-    Route::get('/settings', function () {
-        return view('superadmin.settings');
-    })->name('settings');
 });
 
 // Checkout Routes - WAJIB LOGIN

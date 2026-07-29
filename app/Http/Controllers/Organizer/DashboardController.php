@@ -5,57 +5,83 @@ namespace App\Http\Controllers\Organizer;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $partnerId = auth()->user()->partner_id;
+
+        // 1. Statistik Dasar
+        $totalEvents = Event::where('partner_id', $partnerId)->count();
+        $activeEvents = Event::where('partner_id', $partnerId)->where('date', '>=', now())->count();
         
-        // 🔒 MULTI-TENANT CORE: Ambil data HANYA untuk partner milik user ini
-        $partnerId = $user->partner_id;
-        
-        if (!$partnerId) {
-            return redirect()->route('home')->with('error', 'Anda belum terhubung dengan organisasi manapun.');
-        }
-
-        // 1. Ambil semua event milik partner ini
-        $events = Event::where('partner_id', $partnerId)->get();
-        $eventIds = $events->pluck('id');
-
-        // 2. Analitik Pendapatan (Hanya dari transaksi yang sudah lunas/sukses)
-        // Kita tambahkan 'Success' dan 'success' untuk jaga-jaga perbedaan huruf besar/kecil di database
-        $totalRevenue = Transaction::whereIn('event_id', $eventIds)
-            ->whereIn('status', ['success', 'Success', 'paid', 'settlement'])
-            ->sum('total_price');
-
-        // ✅ 3. TIKET TERJUAL: Hitung dari JUMLAH TRANSAKSI yang sukses
-        // Karena 1 transaksi = 1 tiket (sesuai logika auto-create di EventController), 
-        // menghitung transaksi sukses jauh lebih akurat dan real-time daripada menghitung tabel tickets.
-        $totalTicketsSold = Transaction::whereIn('event_id', $eventIds)
-            ->whereIn('status', ['success', 'Success', 'paid', 'settlement'])
+        $totalTickets = Transaction::whereIn('status', ['success', 'paid', 'settlement'])
+            ->whereHas('event', function($query) use ($partnerId) {
+                $query->where('partner_id', $partnerId);
+            })
             ->count();
 
-        // 4. Event Terbaru (Maksimal 5)
+        $totalRevenue = Transaction::whereIn('status', ['success', 'paid', 'settlement'])
+            ->whereHas('event', function($query) use ($partnerId) {
+                $query->where('partner_id', $partnerId);
+            })
+            ->sum('total_price');
+
+        // 2. Data untuk Grafik Penjualan Tiket (6 Bulan Terakhir)
+        $ticketSalesLabels = [];
+        $ticketSalesData = [];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $ticketSalesLabels[] = $date->format('M Y');
+            
+            $ticketSalesData[] = Transaction::whereIn('status', ['success', 'paid', 'settlement'])
+                ->whereHas('event', function($query) use ($partnerId) {
+                    $query->where('partner_id', $partnerId);
+                })
+                ->whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->count();
+        }
+
+        // 3. Data untuk Grafik Pendapatan per Event (Top 5)
+        $topEvents = Event::where('partner_id', $partnerId)
+            ->withSum(['transactions as revenue' => function($query) {
+                $query->whereIn('status', ['success', 'paid', 'settlement']);
+            }], 'total_price')
+            ->orderByDesc('revenue')
+            ->take(5)
+            ->get();
+
+        // Pastikan selalu array, meski kosong
+        $revenueByEventLabels = $topEvents->pluck('title')->toArray() ?: ['Belum ada data'];
+        $revenueByEventData = $topEvents->pluck('revenue')->toArray() ?: [0];
+
+        // 4. Event Terbaru untuk Tabel
         $recentEvents = Event::where('partner_id', $partnerId)
+            ->withCount(['transactions as sold_tickets' => function($query) {
+                $query->whereIn('status', ['success', 'paid', 'settlement']);
+            }])
+            ->withSum(['transactions as revenue' => function($query) {
+                $query->whereIn('status', ['success', 'paid', 'settlement']);
+            }], 'total_price')
             ->latest()
             ->take(5)
             ->get();
 
-        // 5. Transaksi Terbaru (Maksimal 5, beserta data event-nya)
-        $recentTransactions = Transaction::whereIn('event_id', $eventIds)
-            ->with('event')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        // 6. Kirim data ke view
         return view('organizer.dashboard', compact(
+            'totalEvents',
+            'totalTickets',
             'totalRevenue',
-            'totalTicketsSold',
-            'recentEvents',
-            'recentTransactions'
+            'activeEvents',
+            'ticketSalesLabels',
+            'ticketSalesData',
+            'revenueByEventLabels',
+            'revenueByEventData',
+            'recentEvents'
         ));
     }
 }
