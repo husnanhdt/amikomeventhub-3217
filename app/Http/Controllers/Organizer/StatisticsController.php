@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StatisticsController extends Controller
 {
     public function index()
     {
-        $partnerId = auth()->user()->partner_id;
-        
+        $partnerId = Auth::user()->partner_id;
+
         $events = Event::where('partner_id', $partnerId)
             ->withCount(['transactions as ticket_sold' => function ($query) {
                 $query->whereIn('status', ['success', 'paid', 'settlement']);

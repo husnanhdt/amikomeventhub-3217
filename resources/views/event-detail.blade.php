@@ -192,7 +192,7 @@
                             $percentage = $total > 0 ? ($count / $total) * 100 : 0;
                             @endphp
                             <div class="bg-yellow-400 h-full rounded-full"
-                                style="width: {{ $percentage }}%"></div>
+                                data-width="{{ $percentage }}"></div>
                         </div>
                         <span class="text-sm text-slate-600 w-12">{{ $count }}</span>
                     </div>

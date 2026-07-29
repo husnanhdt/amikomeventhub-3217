@@ -29,6 +29,8 @@ class ProfileController extends Controller
             'partner_description' => 'nullable|string',
         ]);
 
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         // Update data User
         $user->update([
             'name' => $request->name,

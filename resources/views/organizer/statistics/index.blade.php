@@ -44,11 +44,11 @@
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-200 flex-shrink-0">
                                 @if($event->poster_path)
-                                    <img src="{{ asset('storage/' . $event->poster_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . $event->poster_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-                                        <span class="text-white font-bold text-xs">{{ strtoupper(substr($event->title, 0, 2)) }}</span>
-                                    </div>
+                                <div class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                                    <span class="text-white font-bold text-xs">{{ strtoupper(substr($event->title, 0, 2)) }}</span>
+                                </div>
                                 @endif
                             </div>
                             <p class="font-bold text-slate-900 max-w-xs truncate">{{ $event->title }}</p>
@@ -58,10 +58,14 @@
                     <td class="px-6 py-4 font-bold text-green-600">{{ $event->ticket_sold }} tiket</td>
                     <td class="px-6 py-4 font-bold text-indigo-600">Rp {{ number_format($event->revenue ?? 0, 0, ',', '.') }}</td>
                     <td class="px-6 py-4">
+                        @php
+                        $soldPct = min(($event->ticket_sold / max($event->stock, 1)) * 100, 100);
+                        @endphp
                         <div class="w-32 bg-slate-200 rounded-full h-2">
-                            <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ min(($event->ticket_sold / max($event->stock, 1)) * 100, 100) }}%"></div>
+                            {{-- pakai data-width, BUKAN style --}}
+                            <div class="bg-indigo-600 h-2 rounded-full progress-bar" data-width="{{ $soldPct }}"></div>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">{{ number_format(($event->ticket_sold / max($event->stock, 1)) * 100, 0) }}% terjual</p>
+                        <p class="text-xs text-slate-500 mt-1">{{ number_format($soldPct, 0) }}% terjual</p>
                     </td>
                 </tr>
                 @empty
@@ -75,4 +79,11 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.progress-bar').forEach(function (el) {
+        el.style.width = (el.dataset.width || 0) + '%';
+    });
+</script>
+@endsection
 @endsection

@@ -17,20 +17,28 @@
         <p class="text-sm font-semibold text-slate-500 mb-2">Total Ulasan</p>
         <h3 class="text-4xl font-black text-indigo-600">{{ $totalReviews }}</h3>
     </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-sm font-semibold text-slate-500 mb-2">Distribusi Rating</p>
-        <div class="space-y-1">
-            @for($i = 5; $i >= 1; $i--)
-            <div class="flex items-center gap-2 text-xs">
-                <span class="w-3">{{ $i }}★</span>
-                <div class="flex-1 bg-slate-200 rounded-full h-2">
-                    <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ $reviews->where('rating', $i)->count() / max($totalReviews, 1) * 100 }}%"></div>
-                </div>
+    <div class="space-y-1">
+    @for($i = 5; $i >= 1; $i--)
+        @php
+            $pct = $reviews->where('rating', $i)->count() / max($totalReviews, 1) * 100;
+        @endphp
+        <div class="flex items-center gap-2 text-xs">
+            <span class="w-3">{{ $i }}★</span>
+            <div class="flex-1 bg-slate-200 rounded-full h-2">
+                {{-- perhatikan: pakai data-width, BUKAN style --}}
+                <div class="bg-yellow-400 h-2 rounded-full rating-bar" data-width="{{ $pct }}"></div>
             </div>
-            @endfor
         </div>
-    </div>
+    @endfor
 </div>
+</div>
+
+{{-- taruh di paling bawah section content --}}
+<script>
+    document.querySelectorAll('.rating-bar').forEach(function (el) {
+        el.style.width = (el.dataset.width || 0) + '%';
+    });
+</script>
 
 <!-- Daftar Ulasan -->
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">

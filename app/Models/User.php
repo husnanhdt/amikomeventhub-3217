@@ -65,9 +65,11 @@ class User extends Authenticatable
     // ==========================================
 
     // Cek apakah user sudah review event tertentu
-    public function hasReviewedEvent($eventId)
+    public function hasReviewedEvent(int $eventId): bool
     {
-        return $this->reviews()->where('event_id', $eventId)->exists();
+        return Review::where('user_id', $this->id)
+            ->where('event_id', $eventId)
+            ->exists();
     }
     // ✅ METHOD INI YANG HILANG - Cek apakah user adalah organizer/panitia
     public function isOrganizer()

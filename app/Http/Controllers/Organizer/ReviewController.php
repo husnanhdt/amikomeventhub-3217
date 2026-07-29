@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Event;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class ReviewController extends Controller
 {
     public function index()
     {
-        $partnerId = auth()->user()->partner_id;
+        $partnerId = Auth::user()->partner_id;
 
         // 1. Ambil semua ID event milik partner (organizer) ini
         $eventIds = Event::where('partner_id', $partnerId)->pluck('id');

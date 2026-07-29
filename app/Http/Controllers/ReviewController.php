@@ -22,13 +22,18 @@ class ReviewController extends Controller
                 ->with('error', 'Review baru dapat diberikan 1 hari setelah acara selesai.');
         }
 
-        if (Auth::user()->hasReviewedEvent($event->id)) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->hasReviewedEvent($event->id)) {
             return redirect()->route('events.show', $event->id)
                 ->with('error', 'Anda sudah memberikan review untuk acara ini.');
         }
 
         return view('reviews.create', compact('event'));
     }
+
+
 
     public function store(Request $request, Event $event)
     {

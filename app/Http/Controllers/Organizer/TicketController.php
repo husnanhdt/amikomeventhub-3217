@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
     public function index()
     {
-        $partnerId = auth()->user()->partner_id;
+        $partnerId = Auth::user()->partner_id;
 
         // ✅ PERUBAHAN: get() diganti paginate(), map() diganti through()
         $events = Event::where('partner_id', $partnerId)
@@ -43,7 +44,7 @@ class TicketController extends Controller
 
     public function show($eventId)
     {
-        $event = Event::where('partner_id', auth()->user()->partner_id)->findOrFail($eventId);
+        $event = Event::where('partner_id', Auth::user()->partner_id)->findOrFail($eventId);
 
         $transactions = Transaction::where('event_id', $eventId)
             ->whereIn('status', ['success', 'paid', 'settlement'])

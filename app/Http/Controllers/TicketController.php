@@ -14,7 +14,7 @@ class TicketController extends Controller
             ->with('event')
             ->latest()
             ->get();
-        
+
         return view('user.tickets', compact('tickets'));
     }
 
@@ -24,27 +24,30 @@ class TicketController extends Controller
         if ($ticket->user_id !== Auth::id()) {
             abort(403);
         }
-        
+
         return view('user.ticket-detail', compact('ticket'));
     }
 
     // Method untuk check-in tiket (scan QR)
     public function checkIn(Ticket $ticket)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
         // Hanya panitia yang bisa check-in
-        if (!Auth::user()->isOrganizer()) {
+        if (!$user->isOrganizer()) {
             abort(403);
         }
-        
+
         if ($ticket->isUsed()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tiket sudah digunakan!'
             ], 400);
         }
-        
+
         $ticket->markAsUsed();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Check-in berhasil!'

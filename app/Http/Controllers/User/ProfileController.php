@@ -7,6 +7,7 @@ use App\Models\User; // ← TAMBAHKAN INI
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -51,6 +52,9 @@ class ProfileController extends Controller
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Kata sandi lama salah!']);
         }
+
+        /** @var User $user */
+        $user = Auth::user();
 
         $user->password = Hash::make($request->password);
         $user->save();

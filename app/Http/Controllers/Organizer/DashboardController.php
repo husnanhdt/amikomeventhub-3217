@@ -7,12 +7,13 @@ use App\Models\Event;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $partnerId = auth()->user()->partner_id;
+        $partnerId = Auth::user()->partner_id;
 
         // 1. Statistik Dasar
         $totalEvents = Event::where('partner_id', $partnerId)->count();

@@ -8,6 +8,7 @@ use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -119,7 +120,7 @@ class AdminController extends Controller
         $admin = User::findOrFail($id);
         
         // Jangan izinkan hapus diri sendiri
-        if ($admin->id === auth()->id()) {
+        if ($admin->id === Auth::id()) {
             return back()->with('error', 'Anda tidak dapat menghapus akun sendiri!');
         }
         

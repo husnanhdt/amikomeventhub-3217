@@ -31,14 +31,14 @@ class EventController extends Controller
     public function checkout($id)
     {
         // Cek apakah user sudah login
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login')
                 ->with('message', 'Silakan login terlebih dahulu untuk melakukan pemesanan.');
         }
 
         // Lanjutkan proses checkout...
         $event = Event::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         return view('checkout.create', compact('event', 'user'));
     }
@@ -72,7 +72,7 @@ class EventController extends Controller
         if ($event->price == 0) {
             // Buat transaksi langsung SUCCESS (tanpa Midtrans & tanpa biaya admin)
             $transaction = Transaction::create([
-                'user_id'        => auth()->id(),
+                'user_id'        => Auth::id(),
                 'event_id'       => $event->id,
                 'order_id'       => $orderId,
                 'customer_name'  => $validated['customer_name'],
@@ -86,7 +86,7 @@ class EventController extends Controller
             // Auto-create tiket dengan status paid
             Ticket::create([
                 'ticket_code'    => 'TKT-' . strtoupper(substr($orderId, 5, 8)) . '-' . strtoupper(Str::random(1)),
-                'user_id'        => auth()->id(),
+                'user_id'        => Auth::id(),
                 'event_id'       => $event->id,
                 'transaction_id' => $transaction->id,
                 'quantity'       => 1,
@@ -117,7 +117,7 @@ class EventController extends Controller
 
         // Simpan transaksi dengan status PENDING
         $transaction = Transaction::create([
-            'user_id'        => auth()->id(),
+            'user_id'        => Auth::id(),
             'event_id'       => $event->id,
             'order_id'       => $orderId,
             'customer_name'  => $validated['customer_name'],
@@ -131,7 +131,7 @@ class EventController extends Controller
         // Auto-create tiket
         Ticket::create([
             'ticket_code'    => 'TKT-' . strtoupper(substr($orderId, 5, 8)) . '-' . strtoupper(Str::random(1)),
-            'user_id'        => auth()->id(),
+            'user_id'        => Auth::id(),
             'event_id'       => $event->id,
             'transaction_id' => $transaction->id,
             'quantity'       => 1,
